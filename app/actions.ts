@@ -106,6 +106,8 @@ export async function createReservation(time: Date) {
       .not('push_subscription', 'is', null);
 
     if (admins?.length) {
+      console.log(`[Notification] ${admins.length}명의 관리자/사장님에게 알림을 전송합니다.`);
+
       const timeStr = time.toLocaleString('ko-KR', {
         month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
@@ -123,6 +125,30 @@ export async function createReservation(time: Date) {
     }
   } catch (err) {
     console.error('Admin notification failed:', err);
+  }
+
+  // 4. Notify User (Immediate Confirmation)
+  try {
+    const { data: currentUserProfile } = await supabase
+      .from('profiles')
+      .select('push_subscription')
+      .eq('id', user.id)
+      .single();
+
+    if (currentUserProfile?.push_subscription) {
+      const timeStr = time.toLocaleString('ko-KR', {
+        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      await sendPushNotification(
+        currentUserProfile.push_subscription,
+        '예약 대기 중',
+        `${timeStr} 예약이 접수되었습니다. 확정 시 다시 알려드릴게요!`,
+        '/'
+      );
+    }
+  } catch (err) {
+    console.error('User notification failed:', err);
   }
 
   return reservation;
