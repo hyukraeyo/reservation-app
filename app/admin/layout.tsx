@@ -2,6 +2,7 @@ import { checkAdmin, checkSuperAdmin } from './actions'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from '@/app/components/ThemeToggle'
+import { AdminLogoutButton } from './AdminLogoutButton'
 
 export default async function AdminLayout({
   children,
@@ -38,6 +39,7 @@ export default async function AdminLayout({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Link href="/" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textDecoration: 'none' }}>앱으로 돌아가기</Link>
+          <AdminLogoutButton />
           <ThemeToggle />
         </div>
       </header>

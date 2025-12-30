@@ -7,6 +7,8 @@ import styles from './home.module.scss';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ThemeToggle } from '@/app/components/ThemeToggle';
+import Calendar from '@/app/components/Calendar';
+import { useToast, ToastContainer } from '@/app/components/Toast';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -31,9 +33,12 @@ interface HomeClientProps {
 export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [bookingTime, setBookingTime] = useState('');
   const [isBooking, setIsBooking] = useState(false);
   const router = useRouter();
+
+  const { toasts, addToast, removeToast } = useToast();
 
   // Use props for initial state
   const userEmail = initialUserEmail;
@@ -58,34 +63,41 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   }, []);
 
   const subscribe = async () => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator) || isSubscribing) return;
     
-    // Request notification permission
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-        alert('알림 권한을 허용해야 예약 알림을 받을 수 있습니다.');
-        return;
-    }
-
-    const registration = await navigator.serviceWorker.ready;
-    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    setIsSubscribing(true);
     
-    if (!vapidKey) return alert('VAPID 키가 누락되었습니다.');
-
     try {
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidKey),
-        });
+      // Request notification permission
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        addToast('알림 권한을 허용해야 예약 알림을 받을 수 있습니다.', 'error');
+        return;
+      }
 
-        await saveSubscription(JSON.parse(JSON.stringify(subscription)));
-        setIsSubscribed(true);
-        alert('알림 구독이 완료되었습니다!');
+      const registration = await navigator.serviceWorker.ready;
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      
+      if (!vapidKey) {
+        addToast('VAPID 키가 누락되었습니다.', 'error');
+        return;
+      }
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+
+      await saveSubscription(JSON.parse(JSON.stringify(subscription)));
+      setIsSubscribed(true);
+      addToast('알림 구독이 완료되었습니다!', 'success');
     } catch (e: unknown) {
-        console.error(e);
-        let message = '알 수 없는 오류';
-        if (e instanceof Error) message = e.message;
-        alert('구독 중 오류가 발생했습니다: ' + message);
+      console.error(e);
+      let message = '알 수 없는 오류';
+      if (e instanceof Error) message = e.message;
+      addToast('구독 중 오류가 발생했습니다: ' + message, 'error');
+    } finally {
+      setIsSubscribing(false);
     }
   };
 
@@ -95,13 +107,15 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
     const date = new Date(bookingTime);
     try {
       await createReservation(date);
-      alert('예약되었습니다! 1시간 전에 알림을 보내드릴게요.');
+      addToast('예약되었습니다! 1시간 전에 알림을 보내드릴게요.', 'success');
+       // 예약 성공 후 슬롯 새로고침
+      await handleDateChange(date);
       setBookingTime(''); // 예약 성공 후 입력 초기화
     } catch (e: unknown) {
       if (e instanceof Error) {
-        alert('오류: ' + e.message);
+        addToast('오류: ' + e.message, 'error');
       } else {
-        alert('예약 중 오류가 발생했습니다.');
+        addToast('예약 중 오류가 발생했습니다.', 'error');
       }
     } finally {
       setIsBooking(false);
@@ -115,8 +129,33 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
     router.refresh();
   };
 
+  const [reservedSlots, setReservedSlots] = useState<string[]>([]);
+
+  // Import dynamically to avoid hydration mismatch if possible, or just use normal import
+  // We need to import getReservationsByDate.
+  // Wait, imports are at top level. We need to add the import.
+
+  // ... (inside component)
+  
+  const handleDateChange = async (date: Date) => {
+    // Ideally we fetch for the whole month or just the selected day.
+    // The action expects a date string.
+    try {
+      const { getReservationsByDate } = await import('./actions');
+      const slots = await getReservationsByDate(date.toISOString());
+      if (slots) {
+        setReservedSlots(slots || []);
+      }
+    } catch (error) {
+       console.error("Failed to fetch reserved slots", error);
+    }
+  };
+
+  // ...
+
   return (
     <main className={styles.container}>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
       <div className={styles.topBar}>
         <ThemeToggle />
       </div>
@@ -135,7 +174,6 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
           </button>
         </div>
       )}
-      <h1 className={styles.title}>간편 예약</h1>
       
       {isLoading ? (
         <div style={{ color: 'var(--text-secondary)' }}>로딩 중...</div>
@@ -145,25 +183,27 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
             <button 
               onClick={subscribe}
               className={styles.button}
+              disabled={isSubscribing}
+              style={{ opacity: isSubscribing ? 0.7 : 1 }}
             >
-              알림 받기
+              {isSubscribing ? '구독 중...' : '알림 받기'}
             </button>
           )}
 
           {isSubscribed && (
-            <div className={styles.formGroup}>
-              <input 
-                type="datetime-local" 
-                value={bookingTime}
-                onChange={(e) => setBookingTime(e.target.value)}
-                className={styles.input}
-                min={new Date().toISOString().slice(0, 16)}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px' }}>
+              <Calendar 
+                onSelect={setBookingTime} 
+                initialValue={bookingTime}
+                reservedSlots={reservedSlots}
+                onDateChange={handleDateChange}
               />
               <button 
                 onClick={book}
                 disabled={!bookingTime || isBooking}
                 className={styles.secondaryButton}
                 style={{
+                  width: '100%',
                   opacity: (!bookingTime || isBooking) ? 0.6 : 1,
                   cursor: (!bookingTime || isBooking) ? 'not-allowed' : 'pointer'
                 }}

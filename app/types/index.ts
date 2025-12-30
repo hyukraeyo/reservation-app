@@ -2,6 +2,13 @@ export interface Profile {
   id: string;
   email: string | null;
   role: 'user' | 'owner' | 'admin' | null;
+  name?: string | null;
+  phone?: string | null;
+  avatar_url?: string | null;
+  gender?: string | null;
+  age_range?: string | null;
+  birthday?: string | null;
+  birthyear?: string | null;
 }
 
 export interface Reservation {

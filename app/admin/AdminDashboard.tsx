@@ -10,6 +10,7 @@ import Card from '@/app/components/Card'
 export default function AdminDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const supabase = createClient();
 
   const fetchReservations = useCallback(async () => {
@@ -17,7 +18,7 @@ export default function AdminDashboard() {
       const { data, error } = await supabase
         .from('reservations')
         .select('*, profiles(email)')
-        .order('time', { ascending: true });
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       if (data) setReservations(data as unknown as Reservation[]);
@@ -29,6 +30,18 @@ export default function AdminDashboard() {
   }, [supabase]);
 
   useEffect(() => {
+    const fetchUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (profile) setUserRole(profile.role);
+      }
+    };
+    fetchUserRole();
     fetchReservations();
 
     const channel = supabase
@@ -38,7 +51,7 @@ export default function AdminDashboard() {
         { event: '*', schema: 'public', table: 'reservations' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setReservations(prev => [...prev, payload.new as Reservation].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()));
+            setReservations(prev => [payload.new as Reservation, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
             setReservations(prev => prev.map(res => res.id === payload.new.id ? { ...res, ...payload.new } : res));
           } else if (payload.eventType === 'DELETE') {
@@ -97,13 +110,15 @@ export default function AdminDashboard() {
                 <p>승인, 취소 및 시간 확인</p>
               </div>
             </Link>
-            <Link href="/admin/users" className={styles.menuCard}>
-              <div className={styles.menuIcon}>👥</div>
-              <div>
-                <h4>사용자 관리</h4>
-                <p>회원 역할 및 권한 변경</p>
-              </div>
-            </Link>
+            {userRole === 'admin' && (
+              <Link href="/admin/users" className={styles.menuCard}>
+                <div className={styles.menuIcon}>👥</div>
+                <div>
+                  <h4>사용자 관리</h4>
+                  <p>회원 역할 및 권한 변경</p>
+                </div>
+              </Link>
+            )}
             <Link href="/" className={styles.menuCard}>
               <div className={styles.menuIcon}>🏠</div>
               <div>

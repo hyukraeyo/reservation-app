@@ -93,7 +93,7 @@ export async function getReservations(): Promise<Reservation[]> {
         email
       )
     `)
-    .order('time', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
   

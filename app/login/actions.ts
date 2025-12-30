@@ -76,8 +76,10 @@ export async function signInWithKakao() {
     provider: 'kakao',
     options: {
       redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      scopes: 'profile_nickname profile_image account_email gender age_range birthday',
       queryParams: {
-        scope: 'profile_nickname,profile_image,account_email',
+        scope: 'profile_nickname profile_image account_email gender age_range birthday',
+        prompt: 'consent',
       },
     },
   })
@@ -89,4 +91,11 @@ export async function signInWithKakao() {
   if (error) {
     return { error: error.message }
   }
+}
+
+export async function logout() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }

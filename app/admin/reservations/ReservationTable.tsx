@@ -2,15 +2,21 @@
 
 import { Reservation } from '@/app/types'
 import { updateReservationStatus } from '../actions'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
-  const [loading, setLoading] = useState<string | null>(null)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
+  const isProcessing = useRef(false) // 중복 요청 방지용
   const router = useRouter()
 
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
-    setLoading(id)
+    // 이미 처리 중이면 무시
+    if (isProcessing.current || loadingId) return
+    
+    isProcessing.current = true
+    setLoadingId(id)
+    
     try {
       const result = await updateReservationStatus(id, status)
       if (result.success) {
@@ -22,7 +28,8 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       console.error(err)
       alert('상태 변경 중 오류가 발생했습니다.')
     } finally {
-      setLoading(null)
+      setLoadingId(null)
+      isProcessing.current = false
     }
   }
 
@@ -76,35 +83,35 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                       <button
                         onClick={() => handleStatusChange(res.id, 'confirmed')}
-                        disabled={loading === res.id}
+                        disabled={!!loadingId}
                         style={{
                           padding: '4px 12px',
                           borderRadius: '4px',
                           border: 'none',
                           backgroundColor: '#4caf50',
                           color: 'white',
-                          cursor: loading === res.id ? 'not-allowed' : 'pointer',
+                          cursor: loadingId ? 'not-allowed' : 'pointer',
                           fontSize: '0.8rem',
-                          opacity: loading === res.id ? 0.7 : 1
+                          opacity: loadingId ? 0.7 : 1
                         }}
                       >
-                        승인
+                        {loadingId === res.id ? '처리중...' : '승인'}
                       </button>
                       <button
                         onClick={() => handleStatusChange(res.id, 'cancelled')}
-                        disabled={loading === res.id}
+                        disabled={!!loadingId}
                         style={{
                           padding: '4px 12px',
                           borderRadius: '4px',
                           border: 'none',
                           backgroundColor: '#f44336',
                           color: 'white',
-                          cursor: loading === res.id ? 'not-allowed' : 'pointer',
+                          cursor: loadingId ? 'not-allowed' : 'pointer',
                           fontSize: '0.8rem',
-                          opacity: loading === res.id ? 0.7 : 1
+                          opacity: loadingId ? 0.7 : 1
                         }}
                       >
-                        취소
+                        {loadingId === res.id ? '처리중...' : '취소'}
                       </button>
                     </div>
                   )}
