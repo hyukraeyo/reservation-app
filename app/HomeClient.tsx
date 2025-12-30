@@ -115,12 +115,10 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   return (
     <main className={styles.container}>
       <ToastContainer toasts={toasts} />
-      <div className={styles.topBar}>
-        <ThemeToggle />
-      </div>
+
       {userEmail && (
         <div className={styles.userInfo}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className={styles.userEmail}>{userEmail}</span>
             {isAdmin && (
               <Link href="/admin" className={styles.adminLink}>
@@ -128,9 +126,12 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
               </Link>
             )}
           </div>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            로그아웃
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <ThemeToggle />
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              로그아웃
+            </button>
+          </div>
         </div>
       )}
 

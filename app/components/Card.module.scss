@@ -4,6 +4,13 @@
   border-radius: 24px;
   border: 1px solid var(--border-color);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border-radius: 20px;
+  }
 }
 
 .header {
@@ -11,6 +18,10 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 }
 
 .title {

@@ -80,21 +80,22 @@ export default function AdminDashboard() {
     <div className={styles.container}>
 
 
-      {/* 통계 섹션 */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <span className={styles.statLabel}>총 예약</span>
-          <span className={styles.statValue}>{stats.total}</span>
+      <Card title="예약 현황 요약">
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>총 예약</span>
+            <span className={styles.statValue}>{stats.total}</span>
+          </div>
+          <div className={styles.statCard} style={{ borderColor: '#f59e0b' }}>
+            <span className={styles.statLabel}>대기 중</span>
+            <span className={styles.statValue} style={{ color: '#f59e0b' }}>{stats.pending}</span>
+          </div>
+          <div className={styles.statCard} style={{ borderColor: '#10b981' }}>
+            <span className={styles.statLabel}>확정됨</span>
+            <span className={styles.statValue} style={{ color: '#10b981' }}>{stats.confirmed}</span>
+          </div>
         </div>
-        <div className={styles.statCard} style={{ borderColor: '#f59e0b' }}>
-          <span className={styles.statLabel}>대기 중</span>
-          <span className={styles.statValue} style={{ color: '#f59e0b' }}>{stats.pending}</span>
-        </div>
-        <div className={styles.statCard} style={{ borderColor: '#10b981' }}>
-          <span className={styles.statLabel}>확정됨</span>
-          <span className={styles.statValue} style={{ color: '#10b981' }}>{stats.confirmed}</span>
-        </div>
-      </div>
+      </Card>
 
       <div className={styles.mainGrid}>
         {/* 메뉴 링크 섹션 */}

@@ -20,9 +20,11 @@ export default async function AdminLayout({
   return (
     <div className="admin-layout" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)', color: 'var(--text-main)' }}>
       <header className={styles.adminHeader}>
-        <div className={styles.adminNav}>
-          <Link href="/admin" style={{ textDecoration: 'none', color: 'var(--text-main)' }}>
-            <h1 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, whiteSpace: 'nowrap' }}>관리자 대시보드</h1>
+        <div className={styles.adminNav} style={{ flexGrow: 1 }}>
+          <Link href="/admin" className={styles.adminLogo} title="대시보드 홈">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 4v16h12" />
+            </svg>
           </Link>
           <nav className={styles.adminNav}>
             {isSuperAdmin && (

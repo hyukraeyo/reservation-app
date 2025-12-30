@@ -6,6 +6,8 @@ import { login, signup, signInWithKakao } from './actions'
 import { useState, useEffect } from 'react'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { ThemeToggle } from '@/app/components/ThemeToggle'
+
 
 function LoginForm() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -107,6 +109,9 @@ function LoginForm() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.themeWrapper}>
+        <ThemeToggle />
+      </div>
       <div className={styles.loginCard}>
         <div className={styles.header}>
           <h1>{mode === 'login' ? '환영합니다' : '회원가입'}</h1>

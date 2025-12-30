@@ -103,11 +103,47 @@
   padding: 1.25rem;
   border-radius: 16px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  @media (max-width: 480px) {
+    padding: 1.125rem;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    border-radius: 20px;
+  }
 }
+
+.nestItem {
+  background: var(--bg-hover);
+  padding: 1.25rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+
+  :global(.dark) & {
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  &:hover {
+    background: var(--bg-card);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+    border-radius: 14px;
+    gap: 0.75rem;
+  }
+}
+
 
 .cardHeader {
   display: flex;
@@ -190,6 +226,26 @@
       background: var(--bg-hover);
       border-radius: 100px;
     }
+  }
+}
+
+.adminLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-hover);
+  border-radius: 12px;
+  color: var(--primary-color);
+  transition: all 0.2s;
+  border: 1px solid var(--border-color);
+
+  &:hover {
+    transform: scale(1.05);
+    background: var(--primary-color);
+    color: white;
+    border-color: transparent;
   }
 }
 
@@ -294,7 +350,7 @@
               radial-gradient(circle at bottom left, rgba(0, 223, 216, 0.05), transparent);
   
   @media (max-width: 480px) {
-    padding: 6rem 1rem 2rem;
+    padding: 6rem 0.75rem 2rem;
   }
 }
 
@@ -330,9 +386,4 @@
   }
 }
 
-.topBar {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  z-index: 10;
-}
+

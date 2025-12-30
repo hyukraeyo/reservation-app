@@ -12,13 +12,13 @@
 }
 
 .toast {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(30, 41, 59, 0.95);
   color: white;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 50px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -27,9 +27,11 @@
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: auto;
   backdrop-filter: blur(8px);
+  white-space: nowrap;
+  max-width: calc(100vw - 2rem);
 
-  @media (prefers-color-scheme: dark) {
-    background: rgba(255, 255, 255, 0.9);
+  :global(.dark) & {
+    background: rgba(255, 255, 255, 0.95);
     color: #0f172a;
   }
 

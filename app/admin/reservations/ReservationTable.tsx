@@ -148,7 +148,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
           const email = res.profiles?.email || '알 수 없는 사용자';
 
           return (
-            <div key={res.id} className={styles.card}>
+            <div key={res.id} className={styles.nestItem}>
               <div className={styles.cardHeader}>
                 <div>
                   <div className={styles.cardTime}>{formattedDate}</div>
@@ -186,7 +186,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                       gap: '8px'
                     }}
                   >
-                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '승인하기'}
+                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '승인'}
                   </button>
                   <button
                     onClick={() => handleStatusChange(res.id, 'cancelled')}
@@ -206,7 +206,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                       gap: '8px'
                     }}
                   >
-                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '취소하기'}
+                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '취소'}
                   </button>
                 </div>
               )}

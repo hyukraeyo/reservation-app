@@ -100,7 +100,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
       {/* Mobile Card View */}
       <div className={styles.cardList}>
         {visibleUsers.map(user => (
-          <div key={user.id} className={styles.userCard}>
+          <div key={user.id} className={styles.nestItem}>
             <div className={styles.userCardMain}>
               {user.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
