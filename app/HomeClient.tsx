@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client';
 import styles from './home.module.scss';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ThemeToggle } from '@/app/components/ThemeToggle';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -116,6 +117,9 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
 
   return (
     <main className={styles.container}>
+      <div className={styles.topBar}>
+        <ThemeToggle />
+      </div>
       {userEmail && (
         <div className={styles.userInfo}>
           <div>

@@ -7,6 +7,7 @@ import type { Reservation } from '@/app/types'
 
 /**
  * 현재 사용자가 관리자(admin) 또는 사장(owner)인지 확인합니다.
+ * 관리자 페이지 접근 권한 체크에 사용됩니다.
  */
 export async function checkAdmin(): Promise<boolean> {
   const supabase = await createClient()
@@ -23,11 +24,29 @@ export async function checkAdmin(): Promise<boolean> {
 }
 
 /**
- * 모든 사용자 목록을 가져옵니다. (관리자 전용)
+ * 현재 사용자가 최고 관리자(admin)인지 확인합니다.
+ * 사용자 역할 변경 등 민감한 작업에 사용됩니다.
+ */
+export async function checkSuperAdmin(): Promise<boolean> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  return profile?.role === 'admin'
+}
+
+/**
+ * 모든 사용자 목록을 가져옵니다. (admin 전용)
  */
 export async function getUsers() {
-  const isAdmin = await checkAdmin()
-  if (!isAdmin) throw new Error('권한이 없습니다.')
+  const isSuperAdmin = await checkSuperAdmin()
+  if (!isSuperAdmin) throw new Error('최고 관리자만 사용자 목록을 볼 수 있습니다.')
 
   const supabase = await createClient()
   const { data: profiles, error } = await supabase
@@ -39,11 +58,11 @@ export async function getUsers() {
 }
 
 /**
- * 사용자 역할을 변경합니다. (관리자 전용)
+ * 사용자 역할을 변경합니다. (admin 전용 - owner는 불가)
  */
 export async function updateUserRole(userId: string, newRole: string) {
-  const isAdmin = await checkAdmin()
-  if (!isAdmin) throw new Error('권한이 없습니다.')
+  const isSuperAdmin = await checkSuperAdmin()
+  if (!isSuperAdmin) throw new Error('최고 관리자만 역할을 변경할 수 있습니다.')
 
   const supabase = await createClient()
   const { error } = await supabase

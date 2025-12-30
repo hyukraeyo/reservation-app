@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import styles from './admin.module.scss'
 import { Reservation } from '@/app/types'
+import Card from '@/app/components/Card'
 
 export default function AdminDashboard() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -58,6 +59,10 @@ export default function AdminDashboard() {
     confirmed: reservations.filter(r => r.status === 'confirmed').length,
   };
 
+  const LiveBadge = () => (
+    <span className={styles.liveIndicator}>Live</span>
+  );
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -83,8 +88,7 @@ export default function AdminDashboard() {
 
       <div className={styles.mainGrid}>
         {/* 메뉴 링크 섹션 */}
-        <div className={styles.menuSection}>
-          <h3 className={styles.sectionTitle}>빠른 메뉴</h3>
+        <Card title="빠른 메뉴">
           <div className={styles.menuGrid}>
             <Link href="/admin/reservations" className={styles.menuCard}>
               <div className={styles.menuIcon}>📅</div>
@@ -108,15 +112,10 @@ export default function AdminDashboard() {
               </div>
             </Link>
           </div>
-        </div>
+        </Card>
 
         {/* 실시간 현황 섹션 */}
-        <div className={styles.liveSection}>
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>최근 예약 현황</h3>
-            <span className={styles.liveIndicator}>Live</span>
-          </div>
-          
+        <Card title="최근 예약 현황" badge={<LiveBadge />}>
           <div className={styles.liveList}>
             {loading ? (
               <p className={styles.empty}>로딩 중...</p>
@@ -141,8 +140,9 @@ export default function AdminDashboard() {
               </Link>
             )}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   )
 }
+

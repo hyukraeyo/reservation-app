@@ -1,0 +1,30 @@
+.card {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  // 컨텐츠 영역
+}
