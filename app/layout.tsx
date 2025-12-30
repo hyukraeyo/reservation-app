@@ -1,13 +1,12 @@
 
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
-  title: "Reservation App",
-  description: "PWA Reservation System",
+  title: "예약 앱",
+  description: "노쇼 방지 예약 시스템",
   manifest: "/manifest.json",
 };
 
@@ -15,16 +14,24 @@ export const viewport: Viewport = {
   themeColor: "#FFFFFF",
 };
 
+import { Providers } from './providers'
+import { ThemeToggle } from './components/ThemeToggle'
+
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        {children}
+    <html lang="ko" suppressHydrationWarning>
+      <body>
+        <Providers>
+          <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999 }}>
+            <ThemeToggle />
+          </div>
+          {children}
+        </Providers>
       </body>
     </html>
-  );
+  )
 }

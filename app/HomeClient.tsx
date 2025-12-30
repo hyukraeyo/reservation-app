@@ -5,11 +5,12 @@ import { saveSubscription, createReservation } from './actions';
 import { createClient } from '@/utils/supabase/client';
 import styles from './home.module.scss';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
+    .replace(/-/g, '+')
     .replace(/_/g, '/');
 
   const rawData = window.atob(base64);
@@ -28,7 +29,9 @@ interface HomeClientProps {
 
 export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [bookingTime, setBookingTime] = useState('');
+  const [isBooking, setIsBooking] = useState(false);
   const router = useRouter();
 
   // Use props for initial state
@@ -41,8 +44,15 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
       navigator.serviceWorker.ready.then((registration) => {
         registration.pushManager.getSubscription().then((subscription) => {
           setIsSubscribed(!!subscription);
+          setIsLoading(false);
         });
+      }).catch(() => {
+        // If SW fails, just stop loading so UI shows
+        setIsLoading(false);
       });
+    } else {
+      // 서비스 워커 미지원 환경
+      setIsLoading(false);
     }
   }, []);
 
@@ -59,7 +69,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
     const registration = await navigator.serviceWorker.ready;
     const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     
-    if (!vapidKey) return alert('VAPID Key missing');
+    if (!vapidKey) return alert('VAPID 키가 누락되었습니다.');
 
     try {
         const subscription = await registration.pushManager.subscribe({
@@ -70,24 +80,30 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
         await saveSubscription(JSON.parse(JSON.stringify(subscription)));
         setIsSubscribed(true);
         alert('알림 구독이 완료되었습니다!');
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error(e);
-        alert('구독 중 오류가 발생했습니다: ' + e.message);
+        let message = '알 수 없는 오류';
+        if (e instanceof Error) message = e.message;
+        alert('구독 중 오류가 발생했습니다: ' + message);
     }
   };
 
   const book = async () => {
-    if (!bookingTime) return;
+    if (!bookingTime || isBooking) return;
+    setIsBooking(true);
     const date = new Date(bookingTime);
     try {
       await createReservation(date);
       alert('예약되었습니다! 1시간 전에 알림을 보내드릴게요.');
+      setBookingTime(''); // 예약 성공 후 입력 초기화
     } catch (e: unknown) {
       if (e instanceof Error) {
         alert('오류: ' + e.message);
       } else {
         alert('예약 중 오류가 발생했습니다.');
       }
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -101,46 +117,58 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   return (
     <main className={styles.container}>
       {userEmail && (
-        <div style={{ marginBottom: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.userInfo}>
           <div>
             <span>로그인됨: <strong>{userEmail}</strong></span>
             {isAdmin && (
-              <a href="/admin/users" style={{ marginLeft: '10px', color: '#0070f3', textDecoration: 'underline' }}>
+              <Link href="/admin" className={styles.adminLink}>
                 [관리자 페이지]
-              </a>
+              </Link>
             )}
           </div>
-          <button onClick={handleLogout} style={{ marginLeft: '10px', padding: '5px 10px', cursor: 'pointer', border: 'none', background: '#e5e7eb', borderRadius: '4px' }}>
+          <button onClick={handleLogout} className={styles.logoutButton}>
             로그아웃
           </button>
         </div>
       )}
       <h1 className={styles.title}>간편 예약</h1>
       
-      {!isSubscribed && (
-        <button 
-          onClick={subscribe}
-          className={styles.button}
-        >
-          알림 받기
-        </button>
-      )}
+      {isLoading ? (
+        <div style={{ color: 'var(--text-secondary)' }}>로딩 중...</div>
+      ) : (
+        <>
+          {!isSubscribed && (
+            <button 
+              onClick={subscribe}
+              className={styles.button}
+            >
+              알림 받기
+            </button>
+          )}
 
-      {isSubscribed && (
-        <div className={styles.formGroup}>
-          <input 
-            type="datetime-local" 
-            onChange={(e) => setBookingTime(e.target.value)}
-            className={styles.input}
-            min={new Date().toISOString().slice(0, 16)}
-          />
-          <button 
-            onClick={book}
-            className={styles.secondaryButton}
-          >
-            예약하기
-          </button>
-        </div>
+          {isSubscribed && (
+            <div className={styles.formGroup}>
+              <input 
+                type="datetime-local" 
+                value={bookingTime}
+                onChange={(e) => setBookingTime(e.target.value)}
+                className={styles.input}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+              <button 
+                onClick={book}
+                disabled={!bookingTime || isBooking}
+                className={styles.secondaryButton}
+                style={{
+                  opacity: (!bookingTime || isBooking) ? 0.6 : 1,
+                  cursor: (!bookingTime || isBooking) ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isBooking ? '처리 중...' : '예약하기'}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </main>
   );

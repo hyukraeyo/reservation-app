@@ -19,7 +19,7 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  const { data: { user }, error: getUserError } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (user?.email) {
     await supabase.from('profiles').upsert({

@@ -21,13 +21,13 @@ const serwist = new Serwist({
 
 // Push Notification Handler
 self.addEventListener("push", (event) => {
-  const data = event.data?.json() ?? { title: "New Notification", body: "" };
+  const data = event.data?.json() ?? { title: "새 알림", body: "" };
   
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: "/icon-192x192.png",
-      badge: "/badge-72x72.png",
+      // badge: "/badge-72x72.png",
       data: data.url, // URL to open on click
     })
   );

@@ -1,3 +1,4 @@
+
 import HomeClient from './HomeClient';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
@@ -10,7 +11,6 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    // Middleware should have caught this, but double check
     redirect('/login');
   }
 
@@ -23,7 +23,7 @@ export default async function Home() {
       .eq('id', user.id)
       .single();
     
-    if (profile?.role === 'admin') {
+    if (profile?.role === 'admin' || profile?.role === 'owner') {
       isAdmin = true;
     }
   }

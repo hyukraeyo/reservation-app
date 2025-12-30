@@ -1,8 +1,8 @@
 
 {
-  "name": "Reservation App",
-  "short_name": "Reserve",
-  "description": "No-show prevention reservation system",
+  "name": "혁래요 예약 앱",
+  "short_name": "혁래요",
+  "description": "노쇼 방지 예약 시스템",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

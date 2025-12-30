@@ -70,9 +70,20 @@ function LoginForm() {
           setMessage({ type: 'success', text: res.message });
         }
       }
-    } catch (e: any) {
-      setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다. ' + e.message });
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        if (e.message.includes('NEXT_REDIRECT')) {
+          // Redirecting, ignoring error
+          return;
+        }
+        setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다. ' + e.message });
+      } else {
+         setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다.' });
+      }
     } finally {
+      // Don't clear loading if it's a redirect, because the page will unload
+      // But we can't easily distinguish here without checking the error again.
+      // However, if we redirect, the state update on unmounted component should be fine or ignored.
       setLoading(false);
     }
   };
@@ -87,7 +98,7 @@ function LoginForm() {
           alert('카카오 로그인 오류: ' + res.error);
           setLoading(false);
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Login error:', error);
         alert('카카오 로그인 중 오류가 발생했습니다.');
         setLoading(false);
@@ -199,7 +210,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>로딩 중...</div>}>
       <LoginForm />
     </Suspense>
   )

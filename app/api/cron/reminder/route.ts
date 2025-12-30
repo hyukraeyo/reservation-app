@@ -1,13 +1,6 @@
-
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import webPush from 'web-push';
-
-webPush.setVapidDetails(
-  'mailto:example@yourdomain.org',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+import { sendPushNotification } from '@/utils/push';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +19,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Reservation not found' }, { status: 404 });
     }
 
+    // Skip if cancelled
+    if (reservation.status === 'cancelled') {
+        return NextResponse.json({ message: 'Reservation cancelled, skipping notification' });
+    }
+
     const subscription = reservation.profiles?.push_subscription;
 
     if (!subscription) {
@@ -33,13 +31,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Send Push Notification
-    const payload = JSON.stringify({
-      title: 'Reservation Reminder',
-      body: `You have a reservation in 1 hour at ${reservation.time}. Please confirm!`,
-      url: `/reservations/${reservation_id}`
-    });
-
-    await webPush.sendNotification(subscription, payload);
+    await sendPushNotification(
+      subscription,
+      '예약 리마인더',
+      `1시간 후에 예약(${new Date(reservation.time).toLocaleTimeString('ko-KR')})이 있습니다. 확인해 주세요!`,
+      `/`
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
