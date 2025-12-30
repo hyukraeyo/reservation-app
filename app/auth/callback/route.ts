@@ -5,21 +5,21 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  
+
   // 로그인 후 이동할 페이지 (기본값: 메인 화면 '/')
   const next = searchParams.get('next') ?? '/'
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (!error) {
       const { data: { session } } = await supabase.auth.getSession();
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user && session) {
         // Fetch extended profile data directly from Kakao API
-        let kakaoData: any = {};
+        let kakaoData: { profile?: { nickname?: string; profile_image_url?: string }; phone_number?: string; gender?: string; age_range?: string; birthday?: string; birthyear?: string } = {};
         if (session.provider_token) {
           try {
             const kakaoResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
@@ -29,14 +29,14 @@ export async function GET(request: NextRequest) {
             });
             const kakaoJson = await kakaoResponse.json();
             kakaoData = kakaoJson.kakao_account || {};
-            
+
           } catch (fetchError) {
             console.error('Failed to fetch from Kakao API:', fetchError);
           }
         }
 
         const meta = user.user_metadata;
-        
+
         try {
           // Prioritize direct Kakao data, fall back to metadata
           const profileData = {
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
             birthday: kakaoData.birthday || meta.birthday,
             birthyear: kakaoData.birthyear || meta.birthyear,
           };
-          
+
           await supabase.from('profiles').upsert(profileData)
         } catch (upsertError) {
           console.error('Extended profile update failed, falling back to basic:', upsertError);
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
             .select('role')
             .eq('id', user.id)
             .single();
-          
+
           if (profile && (profile.role === 'admin' || profile.role === 'owner')) {
             finalRedirect = '/admin';
           }

@@ -76,7 +76,7 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
   const timeSlots = useMemo(() => {
     if (!selectedDate) return [];
 
-    const slots = [];
+    const slots: { time: string; disabled: boolean }[] = [];
     const isTodayDate = isToday(selectedDate);
     const now = new Date();
 
@@ -136,10 +136,6 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     const endDate = endOfWeek(monthEnd);
 
     const dateFormat = 'd';
-    const rows = [];
-    const days = [];
-    const day = startDate;
-    const formattedDate = '';
 
     // Create one flat array of days to map over
     const allDays = eachDayOfInterval({ start: startDate, end: endDate });

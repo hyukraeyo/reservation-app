@@ -2,11 +2,10 @@
 'use client'
 
 import { logout } from '@/app/login/actions'
-import styles from './admin.module.scss'
 
 export function AdminLogoutButton() {
   return (
-    <button 
+    <button
       onClick={async () => {
         if (confirm('로그아웃 하시겠습니까?')) {
           await logout()

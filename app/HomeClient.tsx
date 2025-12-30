@@ -22,6 +22,9 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>([]);
 
+  const userEmail = initialUserEmail;
+  const isAdmin = initialIsAdmin;
+
   const [isSubscribing, startSubscribing] = useTransition();
   const [isBooking, startBooking] = useTransition();
 
@@ -44,9 +47,11 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
           setIsSubscribed(!!subscription);
           setIsLoading(false);
         });
-      }).catch(() => setIsLoading(false));
+      }).catch(() => {
+        setTimeout(() => setIsLoading(false), 0);
+      });
     } else {
-      setIsLoading(false);
+      setTimeout(() => setIsLoading(false), 0);
     }
   }, []);
 
@@ -107,21 +112,19 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
     router.refresh();
   };
 
-  // ...
-
   return (
     <main className={styles.container}>
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <ToastContainer toasts={toasts} />
       <div className={styles.topBar}>
         <ThemeToggle />
       </div>
       {userEmail && (
         <div className={styles.userInfo}>
-          <div>
-            <span>로그인됨: <strong>{userEmail}</strong></span>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span className={styles.userEmail}>{userEmail}</span>
             {isAdmin && (
               <Link href="/admin" className={styles.adminLink}>
-                [관리자 페이지]
+                Admin
               </Link>
             )}
           </div>
