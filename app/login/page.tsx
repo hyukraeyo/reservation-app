@@ -46,18 +46,18 @@ function LoginForm() {
     setMessage(null);
 
     const formData = new FormData(event.currentTarget);
-    
+
     if (mode === 'signup') {
       const password = formData.get('password') as string;
       const confirmPassword = formData.get('confirmPassword') as string;
-      
+
       if (password !== confirmPassword) {
         setMessage({ type: 'error', text: '비밀번호가 일치하지 않습니다.' });
         setLoading(false);
         return;
       }
     }
-    
+
     try {
       if (mode === 'login') {
         const res = await login(formData);
@@ -78,7 +78,7 @@ function LoginForm() {
         }
         setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다. ' + e.message });
       } else {
-         setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다.' });
+        setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다.' });
       }
     } finally {
       // Don't clear loading if it's a redirect, because the page will unload
@@ -91,17 +91,17 @@ function LoginForm() {
   const handleKakaoLogin = async () => {
     setLoading(true);
     try {
-        const res = await signInWithKakao();
-        if (res?.url) {
-          window.location.href = res.url;
-        } else if (res?.error) {
-          alert('카카오 로그인 오류: ' + res.error);
-          setLoading(false);
-        }
-    } catch (error: unknown) {
-        console.error('Login error:', error);
-        alert('카카오 로그인 중 오류가 발생했습니다.');
+      const res = await signInWithKakao();
+      if (res?.url) {
+        window.location.href = res.url;
+      } else if (res?.error) {
+        alert('카카오 로그인 오류: ' + res.error);
         setLoading(false);
+      }
+    } catch (error: unknown) {
+      console.error('Login error:', error);
+      alert('카카오 로그인 중 오류가 발생했습니다.');
+      setLoading(false);
     }
   };
 
@@ -113,29 +113,29 @@ function LoginForm() {
           <p>{mode === 'login' ? '예약 관리를 위해 로그인해주세요' : '무료로 예약을 시작해보세요'}</p>
         </div>
 
-        <button 
-            type="button" 
-            className={styles.kakaoButton}
-            onClick={handleKakaoLogin}
-            disabled={loading}
+        <button
+          type="button"
+          className={styles.kakaoButton}
+          onClick={handleKakaoLogin}
+          disabled={loading}
         >
-            카카오로 시작하기
+          카카오로 시작하기
         </button>
 
         <div className={styles.divider}>
-            <span>또는 이메일로 시작하기</span>
+          <span>또는 이메일로 시작하기</span>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           {message && (
-            <div style={{ 
-              padding: '10px', 
-              marginBottom: '15px', 
+            <div style={{
+              padding: '10px',
+              marginBottom: '15px',
               backgroundColor: message.type === 'error' ? '#fee2e2' : '#dcfce7',
               color: message.type === 'error' ? '#dc2626' : '#16a34a',
               borderRadius: '4px',
               fontSize: '0.9rem',
-              whiteSpace: 'pre-line' 
+              whiteSpace: 'pre-line'
             }}>
               {message.text}
             </div>
@@ -143,23 +143,51 @@ function LoginForm() {
 
           <div className={styles.inputGroup}>
             <label htmlFor="email">이메일</label>
-            <input 
-              id="email" 
-              name="email" 
-              type="email" 
-              placeholder="hello@example.com" 
-              required 
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="hello@example.com"
+              required
             />
           </div>
-          
+
+          {mode === 'signup' && (
+            <>
+              <div className={styles.inputGroup}>
+                <label htmlFor="full_name">이름</label>
+                <input
+                  id="full_name"
+                  name="full_name"
+                  type="text"
+                  placeholder="홍길동"
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="phone">전화번호</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  required
+                  pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}"
+                  title="010-0000-0000 형식으로 입력해주세요."
+                />
+              </div>
+            </>
+          )}
+
           <div className={styles.inputGroup}>
             <label htmlFor="password">비밀번호</label>
-            <input 
-              id="password" 
-              name="password" 
-              type="password" 
-              placeholder="••••••••" 
-              required 
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
               minLength={6}
             />
           </div>
@@ -167,32 +195,43 @@ function LoginForm() {
           {mode === 'signup' && (
             <div className={styles.inputGroup}>
               <label htmlFor="confirmPassword">비밀번호 확인</label>
-              <input 
-                id="confirmPassword" 
-                name="confirmPassword" 
-                type="password" 
-                placeholder="••••••••" 
-                required 
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                required
                 minLength={6}
               />
             </div>
           )}
 
           <div className={styles.actions}>
-            <button 
-              type="submit" 
-              className={styles.loginButton} 
+            <button
+              type="submit"
+              className={styles.loginButton}
               disabled={loading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}
             >
-              {loading ? '처리 중...' : (mode === 'login' ? '로그인' : '가입하기')}
+              {loading ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>처리 중...</span>
+                </>
+              ) : (mode === 'login' ? '로그인' : '가입하기')}
             </button>
-            
+
             <div className={styles.divider}>
               <span>또는</span>
             </div>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={styles.signupButton}
               onClick={() => {
                 setMode(mode === 'login' ? 'signup' : 'login')

@@ -13,10 +13,10 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
     // 이미 처리 중이면 무시
     if (isProcessing.current || loadingId) return
-    
+
     isProcessing.current = true
     setLoadingId(id)
-    
+
     try {
       const result = await updateReservationStatus(id, status)
       if (result.success) {
@@ -52,9 +52,9 @@ export default function ReservationTable({ reservations }: { reservations: Reser
         <tbody>
           {reservations.map(res => {
             const date = new Date(res.time);
-            const formattedDate = date.toLocaleDateString('ko-KR', { 
-                year: 'numeric', month: 'long', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit' 
+            const formattedDate = date.toLocaleDateString('ko-KR', {
+              year: 'numeric', month: 'long', day: 'numeric',
+              hour: '2-digit', minute: '2-digit'
             });
 
             const email = res.profiles?.email || '알 수 없는 사용자';
@@ -64,9 +64,9 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                 <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{formattedDate}</td>
                 <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{email}</td>
                 <td style={{ padding: '0.75rem' }}>
-                  <span style={{ 
-                    padding: '4px 8px', 
-                    borderRadius: '12px', 
+                  <span style={{
+                    padding: '4px 8px',
+                    borderRadius: '12px',
                     fontSize: '0.8rem',
                     backgroundColor: res.status === 'confirmed' ? 'rgba(76, 175, 80, 0.1)' : res.status === 'cancelled' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(255, 152, 0, 0.1)',
                     color: res.status === 'confirmed' ? '#4caf50' : res.status === 'cancelled' ? '#f44336' : '#ff9800',
@@ -92,10 +92,18 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                           color: 'white',
                           cursor: loadingId ? 'not-allowed' : 'pointer',
                           fontSize: '0.8rem',
-                          opacity: loadingId ? 0.7 : 1
+                          opacity: loadingId ? 0.7 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}
                       >
-                        {loadingId === res.id ? '처리중...' : '승인'}
+                        {loadingId === res.id ? (
+                          <>
+                            <div className="spinner" style={{ width: '0.8rem', height: '0.8rem' }}></div>
+                            <span>처리중...</span>
+                          </>
+                        ) : '승인'}
                       </button>
                       <button
                         onClick={() => handleStatusChange(res.id, 'cancelled')}
@@ -108,10 +116,18 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                           color: 'white',
                           cursor: loadingId ? 'not-allowed' : 'pointer',
                           fontSize: '0.8rem',
-                          opacity: loadingId ? 0.7 : 1
+                          opacity: loadingId ? 0.7 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}
                       >
-                        {loadingId === res.id ? '처리중...' : '취소'}
+                        {loadingId === res.id ? (
+                          <>
+                            <div className="spinner" style={{ width: '0.8rem', height: '0.8rem' }}></div>
+                            <span>처리중...</span>
+                          </>
+                        ) : '취소'}
                       </button>
                     </div>
                   )}

@@ -1,23 +1,23 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { 
-  format, 
-  addMonths, 
-  subMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  isSameDay, 
-  isToday, 
-  setHours, 
-  setMinutes, 
-  isBefore, 
-  startOfDay 
+import { useState, useEffect, useMemo } from 'react';
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  isToday,
+  setHours,
+  setMinutes,
+  isBefore,
+  startOfDay
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import styles from './calendar.module.scss';
@@ -34,9 +34,10 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  // Convert reserved ISO strings to local HH:mm format for easy comparison
-  const reservedTimeSet = new Set(
-    reservedSlots.map(iso => format(new Date(iso), 'HH:mm'))
+  // Optimize reserved slot lookups with useMemo
+  const reservedTimeSet = useMemo(() =>
+    new Set(reservedSlots.map(iso => format(new Date(iso), 'HH:mm'))),
+    [reservedSlots]
   );
 
   useEffect(() => {
@@ -46,77 +47,56 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
         setSelectedDate(date);
         setCurrentMonth(date);
         setSelectedTime(format(date, 'HH:mm'));
-        // We might want to trigger onDateChange here too if we want to fetch initial data
-        // but typically initial load handles that or we just wait for user interaction.
-        if (onDateChange) onDateChange(date);
+        onDateChange?.(date);
       }
     }
-  }, [initialValue]);
+  }, [initialValue, onDateChange]);
 
-  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  const handlePrevMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
+  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
 
   const handleDateClick = (day: Date) => {
-    // Prevent selecting past days
     if (isBefore(day, startOfDay(new Date()))) return;
-    
+
     setSelectedDate(day);
-    setSelectedTime(null); // Reset time when day changes
-    onSelect(''); // Reset parent value until time is picked
-    
-    if (onDateChange) {
-      onDateChange(day);
-    }
+    setSelectedTime(null);
+    onSelect('');
+    onDateChange?.(day);
   };
 
   const handleTimeClick = (timeStr: string) => {
     if (!selectedDate) return;
-
     setSelectedTime(timeStr);
-    
+
     const [hours, minutes] = timeStr.split(':').map(Number);
     const combinedDate = setMinutes(setHours(selectedDate, hours), minutes);
-    
-    const year = combinedDate.getFullYear();
-    const month = String(combinedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(combinedDate.getDate()).padStart(2, '0');
-    const isoString = `${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    
-    onSelect(isoString);
+    onSelect(combinedDate.toISOString());
   };
 
-  const generateTimeSlots = () => {
+  const timeSlots = useMemo(() => {
+    if (!selectedDate) return [];
+
     const slots = [];
-    const startHour = 10;
-    const endHour = 20;
-    const now = new Date(); // To check current time
-    const isTodayDate = selectedDate ? isToday(selectedDate) : false;
+    const isTodayDate = isToday(selectedDate);
+    const now = new Date();
 
-    for (let hour = startHour; hour <= endHour; hour++) {
-      const timeString = `${String(hour).padStart(2, '0')}:00`;
-      const dateWithTime = setMinutes(setHours(selectedDate || now, hour), 0);
-      
-      const isPast = isTodayDate && isBefore(dateWithTime, now);
-      const isReserved = reservedTimeSet.has(timeString);
+    for (let hour = 10; hour <= 20; hour++) {
+      [0, 30].forEach(minutes => {
+        if (hour === 20 && minutes === 30) return; // End at 20:00 or as defined
 
-      if (!isPast) {
-         slots.push({ time: timeString, disabled: isReserved });
-      }
+        const timeString = `${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        const slotDate = setMinutes(setHours(selectedDate, hour), minutes);
 
-      if (hour !== endHour) {
-        const timeString30 = `${String(hour).padStart(2, '0')}:30`;
-        const dateWithTime30 = setMinutes(setHours(selectedDate || now, hour), 30);
-        
-        const isPast30 = isTodayDate && isBefore(dateWithTime30, now);
-        const isReserved30 = reservedTimeSet.has(timeString30);
-        
-        if (!isPast30) {
-            slots.push({ time: timeString30, disabled: isReserved30 });
-        }
-      }
+        if (isTodayDate && isBefore(slotDate, now)) return;
+
+        slots.push({
+          time: timeString,
+          disabled: reservedTimeSet.has(timeString)
+        });
+      });
     }
     return slots;
-  };
+  }, [selectedDate, reservedTimeSet]);
 
   const renderHeader = () => {
     return (
@@ -128,7 +108,7 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
         </button>
         <h2>{format(currentMonth, 'yyyy년 M월', { locale: ko })}</h2>
         <button onClick={handleNextMonth} className={styles.navButton} aria-label="Next month">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
@@ -157,10 +137,10 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
 
     const dateFormat = 'd';
     const rows = [];
-    let days = [];
-    let day = startDate;
-    let formattedDate = '';
-    
+    const days = [];
+    const day = startDate;
+    const formattedDate = '';
+
     // Create one flat array of days to map over
     const allDays = eachDayOfInterval({ start: startDate, end: endDate });
 
@@ -198,14 +178,14 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
       {renderHeader()}
       {renderDays()}
       {renderCells()}
-      
+
       {selectedDate && (
         <div className={styles.timeContainer}>
           <div className={styles.timeTitle}>
             {format(selectedDate, 'M월 d일', { locale: ko })} 시간 선택
           </div>
           <div className={styles.timeGrid}>
-            {generateTimeSlots().map(({ time, disabled }) => (
+            {timeSlots.map(({ time, disabled }) => (
               <button
                 key={time}
                 disabled={disabled}
