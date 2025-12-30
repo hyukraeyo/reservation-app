@@ -45,28 +45,27 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   const isAdmin = initialIsAdmin;
 
   useEffect(() => {
-    // 1. Check for Service Worker & Push Subscription
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    // 1. Check for Service Worker & Push Manager Support
+    if ('serviceWorker' in navigator && 'PushManager' in window && process.env.NODE_ENV === 'production') {
       navigator.serviceWorker.ready.then((registration) => {
         registration.pushManager.getSubscription().then((subscription) => {
           setIsSubscribed(!!subscription);
           setIsLoading(false);
         });
       }).catch(() => {
-        // If SW fails, just stop loading so UI shows
         setIsLoading(false);
       });
     } else {
-      // 서비스 워커 미지원 환경
+      // In development or if SW not supported/ready
       setIsLoading(false);
     }
   }, []);
 
   const subscribe = async () => {
     if (!('serviceWorker' in navigator) || isSubscribing) return;
-    
+
     setIsSubscribing(true);
-    
+
     try {
       // Request notification permission
       const permission = await Notification.requestPermission();
@@ -77,7 +76,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
 
       const registration = await navigator.serviceWorker.ready;
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-      
+
       if (!vapidKey) {
         addToast('VAPID 키가 누락되었습니다.', 'error');
         return;
@@ -108,7 +107,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
     try {
       await createReservation(date);
       addToast('예약되었습니다! 1시간 전에 알림을 보내드릴게요.', 'success');
-       // 예약 성공 후 슬롯 새로고침
+      // 예약 성공 후 슬롯 새로고침
       await handleDateChange(date);
       setBookingTime(''); // 예약 성공 후 입력 초기화
     } catch (e: unknown) {
@@ -136,7 +135,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
   // Wait, imports are at top level. We need to add the import.
 
   // ... (inside component)
-  
+
   const handleDateChange = async (date: Date) => {
     // Ideally we fetch for the whole month or just the selected day.
     // The action expects a date string.
@@ -147,7 +146,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
         setReservedSlots(slots || []);
       }
     } catch (error) {
-       console.error("Failed to fetch reserved slots", error);
+      console.error("Failed to fetch reserved slots", error);
     }
   };
 
@@ -174,13 +173,13 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
           </button>
         </div>
       )}
-      
+
       {isLoading ? (
         <div style={{ color: 'var(--text-secondary)' }}>로딩 중...</div>
       ) : (
         <>
-          {!isSubscribed && (
-            <button 
+          {(!isSubscribed && process.env.NODE_ENV === 'production') ? (
+            <button
               onClick={subscribe}
               className={styles.button}
               disabled={isSubscribing}
@@ -188,17 +187,20 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
             >
               {isSubscribing ? '구독 중...' : '알림 받기'}
             </button>
-          )}
-
-          {isSubscribed && (
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px' }}>
-              <Calendar 
-                onSelect={setBookingTime} 
+              {!isSubscribed && process.env.NODE_ENV === 'development' && (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '-0.5rem' }}>
+                  (개발 모드: 알림 구독 없이 예약 기능을 테스트할 수 있습니다)
+                </p>
+              )}
+              <Calendar
+                onSelect={setBookingTime}
                 initialValue={bookingTime}
                 reservedSlots={reservedSlots}
                 onDateChange={handleDateChange}
               />
-              <button 
+              <button
                 onClick={book}
                 disabled={!bookingTime || isBooking}
                 className={styles.secondaryButton}
