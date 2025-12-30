@@ -15,6 +15,13 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          email: user.email,
+        })
+      }
       // 인증 성공 시 메인 화면(또는 next)으로 리다이렉트
       return redirect(`${origin}${next}`)
     }

@@ -36,7 +36,6 @@ export default function Dashboard() {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'reservations' },
         (payload) => {
-          console.log('Update received!', payload);
           setReservations((prev) => 
             prev.map((res) => (res.id === payload.new.id ? (payload.new as Reservation) : res))
           );

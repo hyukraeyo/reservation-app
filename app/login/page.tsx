@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation'
 function LoginForm() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
   // Supabase/Auth Error Mapping
   const getErrorMessage = (error: string) => {
@@ -34,7 +35,7 @@ function LoginForm() {
     }
 
     if (error) {
-      alert(getErrorMessage(error));
+      setMessage({ type: 'error', text: getErrorMessage(error) });
     }
   }, [error, code]);
 
@@ -42,6 +43,8 @@ function LoginForm() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    setMessage(null);
+
     const formData = new FormData(event.currentTarget);
     
     if (mode === 'signup') {
@@ -49,7 +52,7 @@ function LoginForm() {
       const confirmPassword = formData.get('confirmPassword') as string;
       
       if (password !== confirmPassword) {
-        alert('비밀번호가 일치하지 않습니다.');
+        setMessage({ type: 'error', text: '비밀번호가 일치하지 않습니다.' });
         setLoading(false);
         return;
       }
@@ -58,12 +61,17 @@ function LoginForm() {
     try {
       if (mode === 'login') {
         const res = await login(formData);
-        if (res?.error) alert(getErrorMessage(res.error));
+        if (res?.error) setMessage({ type: 'error', text: getErrorMessage(res.error) });
       } else {
         const res = await signup(formData);
-        if (res?.error) alert(getErrorMessage(res.error));
-        else if (res?.success) alert(res.message);
+        if (res?.error) {
+          setMessage({ type: 'error', text: getErrorMessage(res.error) });
+        } else if (res?.success) {
+          setMessage({ type: 'success', text: res.message });
+        }
       }
+    } catch (e: any) {
+      setMessage({ type: 'error', text: '알 수 없는 오류가 발생했습니다. ' + e.message });
     } finally {
       setLoading(false);
     }
@@ -108,6 +116,20 @@ function LoginForm() {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
+          {message && (
+            <div style={{ 
+              padding: '10px', 
+              marginBottom: '15px', 
+              backgroundColor: message.type === 'error' ? '#fee2e2' : '#dcfce7',
+              color: message.type === 'error' ? '#dc2626' : '#16a34a',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              whiteSpace: 'pre-line' 
+            }}>
+              {message.text}
+            </div>
+          )}
+
           <div className={styles.inputGroup}>
             <label htmlFor="email">이메일</label>
             <input 
@@ -161,7 +183,10 @@ function LoginForm() {
             <button 
               type="button" 
               className={styles.signupButton}
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              onClick={() => {
+                setMode(mode === 'login' ? 'signup' : 'login')
+                setMessage(null)
+              }}
             >
               {mode === 'login' ? '계정 만들기' : '이미 계정이 있어요'}
             </button>
