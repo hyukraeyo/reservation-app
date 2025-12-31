@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   format,
   addMonths,
@@ -35,6 +35,13 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
+  // Refs
+  const timeSectionRef = useRef<HTMLDivElement>(null);
+  const timeGridRef = useRef<HTMLDivElement>(null);
+
+  // Scroll state for fade indicators
+  const [scrollState, setScrollState] = useState({ top: false, bottom: false });
+
   // Optimize reserved slot lookups with useMemo
   const reservedTimeSet = useMemo(() =>
     new Set(reservedSlots.map(iso => format(new Date(iso), 'HH:mm'))),
@@ -56,25 +63,24 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     }
   }, [initialValue, onDateChange]);
 
-  const handlePrevMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
-  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+  // Scroll to time section when date is selected
+  useEffect(() => {
+    if (selectedDate && timeSectionRef.current) {
+      setTimeout(() => {
+        timeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [selectedDate]);
 
-  const handleDateClick = (day: Date) => {
-    if (isBefore(day, startOfDay(new Date()))) return;
-
-    setSelectedDate(day);
-    setSelectedTime(null);
-    onSelect('');
-    onDateChange?.(day);
-  };
-
-  const handleTimeClick = (timeStr: string) => {
-    if (!selectedDate) return;
-    setSelectedTime(timeStr);
-
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const combinedDate = setMinutes(setHours(selectedDate, hours), minutes);
-    onSelect(combinedDate.toISOString());
+  // Check scroll position to toggle fades
+  const checkScroll = () => {
+    if (timeGridRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = timeGridRef.current;
+      setScrollState({
+        top: scrollTop > 10,
+        bottom: scrollTop + clientHeight < scrollHeight - 10
+      });
+    }
   };
 
   const timeSlots = useMemo(() => {
@@ -84,20 +90,10 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     const isTodayDate = isToday(selectedDate);
     const now = new Date();
 
-    // Define business hours: 10:00 to 20:00 (Last booking slot depends on duration)
-    // Basic slots are 10:00, 10:30, ... 19:30? (If close at 20:00)
-    // Let's generate all 30-min slots from 10:00 to 19:30 (since 20:00 is close time)
-
-    // Generate all base slots first
     const allBaseSlots: string[] = [];
     for (let hour = 10; hour <= 20; hour++) {
       [0, 30].forEach(minutes => {
-        if (hour === 20 && minutes > 0) return; // Allow 20:00? Usually 20:00 is close. So last slot is 19:30.
-        // If strictly closing at 20:00, 19:30 is last 30m slot.
-        // If 20:00 is allowed as start time, then open till 20:30? 
-        // Previous code had: `if (hour === 20 && minutes === 30) return;` -> allowed 20:00.
-        // Let's stick to existing logic: 10:00 ... 20:00.
-
+        if (hour === 20 && minutes > 0) return;
         if (hour === 20 && minutes === 30) return;
         allBaseSlots.push(`${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
       });
@@ -118,13 +114,11 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
       // 2. Check if this slot OR required future slots are occupied or out of bounds
       if (!isDisabled) {
         for (let i = 0; i < blocksNeeded; i++) {
-          // Check bounds
           if (index + i >= allBaseSlots.length) {
             isDisabled = true;
             break;
           }
           const checkTimeStr = allBaseSlots[index + i];
-          // Check reservation
           if (reservedTimeSet.has(checkTimeStr)) {
             isDisabled = true;
             break;
@@ -140,6 +134,37 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
 
     return slots;
   }, [selectedDate, reservedTimeSet, blocksNeeded]);
+
+  // Re-check scroll whenever time slots change
+  useEffect(() => {
+    // Also scroll to top of grid when date changes (new slots)
+    if (timeGridRef.current) {
+      timeGridRef.current.scrollTop = 0;
+      // Small timeout to allow layout to settle before checking scroll height
+      setTimeout(checkScroll, 0);
+    }
+  }, [timeSlots]);
+
+  const handlePrevMonth = () => setCurrentMonth(prev => subMonths(prev, 1));
+  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+
+  const handleDateClick = (day: Date) => {
+    if (isBefore(day, startOfDay(new Date()))) return;
+
+    setSelectedDate(day);
+    setSelectedTime(null);
+    onSelect('');
+    onDateChange?.(day);
+  };
+
+  const handleTimeClick = (timeStr: string) => {
+    if (!selectedDate) return;
+    setSelectedTime(timeStr);
+
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const combinedDate = setMinutes(setHours(selectedDate, hours), minutes);
+    onSelect(combinedDate.toISOString());
+  };
 
   const renderHeader = () => {
     return (
@@ -179,13 +204,10 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     const endDate = endOfWeek(monthEnd);
 
     const dateFormat = 'd';
-
-    // Create one flat array of days to map over
     const allDays = eachDayOfInterval({ start: startDate, end: endDate });
 
     return (
       <div className={styles.grid}>
-        {/* Helper to just use the grid directly without nested rows div for CSS Grid */}
         {allDays.map((val, i) => {
           const isSelected = selectedDate ? isSameDay(val, selectedDate) : false;
           const isTodayDate = isToday(val);
@@ -219,11 +241,18 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
       {renderCells()}
 
       {selectedDate && (
-        <div className={styles.timeContainer}>
+        <div
+          className={`${styles.timeContainer} ${scrollState.top ? styles.showTopFade : ''} ${scrollState.bottom ? styles.showBottomFade : ''}`}
+          ref={timeSectionRef}
+        >
           <div className={styles.timeTitle}>
             {format(selectedDate, 'M월 d일', { locale: ko })} 시간 선택
           </div>
-          <div className={styles.timeGrid}>
+          <div
+            className={styles.timeGrid}
+            ref={timeGridRef}
+            onScroll={checkScroll}
+          >
             {timeSlots.map(({ time, disabled }) => (
               <button
                 key={time}

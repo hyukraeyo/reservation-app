@@ -1,8 +1,12 @@
+
 .container {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
   animation: fadeIn 0.5s ease;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 
   @media (max-width: 768px) {
     gap: 1.5rem;
@@ -11,18 +15,18 @@
 
 .header {
   .title {
-    font-size: 2.25rem;
+    font-size: 2rem;
     font-weight: 800;
     margin: 0 0 0.5rem 0;
-    background: linear-gradient(135deg, #007cf0, #00dfd8);
+    background: var(--button-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
   }
   
   .subtitle {
     color: var(--text-secondary);
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin: 0;
   }
 }
@@ -33,41 +37,43 @@
   gap: 1.5rem;
 
   @media (max-width: 768px) {
-    gap: 0.75rem;
+    gap: 1rem;
   }
 }
 
 .statCard {
   background: var(--bg-hover);
-  padding: 1.5rem 1rem;
+  padding: 1.5rem;
   border-radius: 20px;
   border: 1px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.25rem;
-  transition: all 0.2s;
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (max-width: 768px) {
-    padding: 1rem 0.5rem;
+    padding: 1.25rem 0.75rem;
     border-radius: 16px;
-    gap: 0.1rem;
   }
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
     background: var(--bg-card);
     border-color: var(--border-color);
+    box-shadow: var(--shadow-md);
   }
 
   .statLabel {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 
     @media (max-width: 768px) {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
   }
 
@@ -75,6 +81,7 @@
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--text-main);
+    letter-spacing: -0.02em;
 
     @media (max-width: 768px) {
       font-size: 1.75rem;
@@ -89,7 +96,7 @@
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 }
 
@@ -101,36 +108,37 @@
 .menuCard {
   background: var(--bg-hover);
   padding: 1.5rem;
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid transparent;
   display: flex;
   align-items: center;
   gap: 1.25rem;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     background: var(--bg-card);
     border-color: var(--primary-color);
     transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
   }
 
   @media (max-width: 768px) {
-    padding: 1rem;
-    gap: 1rem;
-    border-radius: 14px;
+    padding: 1.25rem;
+    border-radius: 16px;
   }
 
   .menuIcon {
     width: 48px;
     height: 48px;
-    background: rgba(0, 124, 240, 0.1);
+    background: var(--bg-card);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 14px;
     color: var(--primary-color);
     transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
 
     svg {
       width: 24px;
@@ -140,26 +148,28 @@
 
   h4 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-main);
+    letter-spacing: -0.01em;
   }
 
   p {
     margin: 4px 0 0 0;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
   }
 }
 
 .liveIndicator {
-  background: #ef4444;
-  color: white;
+  background: var(--error-bg);
+  color: var(--error-text);
   padding: 4px 10px;
   border-radius: 100px;
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   animation: pulse 2s infinite;
 }
 
@@ -173,7 +183,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   background: var(--bg-hover);
   border-radius: 16px;
   border: 1px solid transparent;
@@ -182,11 +192,12 @@
   &:hover {
     border-color: var(--border-color);
     background: var(--bg-card);
+    transform: translateX(2px);
   }
 
   @media (max-width: 768px) {
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
+    padding: 1rem;
+    border-radius: 14px;
   }
 }
 
@@ -194,14 +205,15 @@
   .liveTime {
     margin: 0;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-main);
+    letter-spacing: -0.01em;
   }
   .liveId {
     margin: 2px 0 0 0;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    font-family: monospace;
+    font-weight: 500;
   }
 }
 
@@ -210,34 +222,43 @@
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
 
-  &.confirmed { background: rgba(16, 185, 129, 0.1); color: #059669; }
-  &.pending { background: rgba(245, 158, 11, 0.1); color: #d97706; }
-  &.cancelled { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+  &.confirmed { background: var(--success-bg); color: var(--success-text); }
+  &.pending { background: var(--pending-bg); color: var(--pending-text); }
+  &.cancelled { background: var(--error-bg); color: var(--error-text); }
 }
 
 .viewMore {
+  display: block;
   text-align: center;
-  padding-top: 1rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
   color: var(--primary-color);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
+  background: var(--bg-hover);
+  border-radius: 12px;
+  transition: all 0.2s;
 
   &:hover {
-    text-decoration: underline;
+    background: var(--bg-card);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
   }
 }
 
 .empty {
   text-align: center;
   color: var(--text-secondary);
-  padding: 2rem;
+  padding: 3rem 1rem;
+  font-weight: 500;
 }
 
 @keyframes pulse {
   0% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.6; }
   100% { opacity: 1; }
 }
 

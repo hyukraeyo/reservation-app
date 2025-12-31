@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     try {
       const { data, error } = await supabase
         .from('reservations')
-        .select('*, profiles(email)')
+        .select('*, profiles(email, full_name)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
         { event: '*', schema: 'public', table: 'reservations' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setReservations(prev => [payload.new as Reservation, ...prev]);
+            fetchReservations();
           } else if (payload.eventType === 'UPDATE') {
             setReservations(prev => prev.map(res => res.id === payload.new.id ? { ...res, ...payload.new } : res));
           } else if (payload.eventType === 'DELETE') {
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
                 <div key={res.id} className={styles.liveItem}>
                   <div className={styles.liveInfo}>
                     <p className={styles.liveTime}>{new Date(res.time).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                    <p className={styles.liveId}>ID: {res.id.slice(0, 8)}</p>
+                    <p className={styles.liveId}>{res.profiles?.full_name || res.profiles?.email?.split('@')[0] || '익명'}</p>
                   </div>
                   <span className={`${styles.statusBadge} ${styles[res.status]}`}>
                     {res.status === 'confirmed' ? '확정' : res.status === 'cancelled' ? '취소' : '대기'}
@@ -177,4 +177,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-

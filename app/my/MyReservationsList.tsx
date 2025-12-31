@@ -24,9 +24,10 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
     return (
         <>
             <ToastContainer toasts={toasts} />
-            <Card title="내 예약 내역">
+            <div className={styles.historyCard}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>내 예약 내역</h2>
                 {initialReservations.length === 0 ? (
-                    <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'var(--bg-card)', borderRadius: '24px', border: '1px solid var(--border-color)' }}>
                         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
                         <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>아직 예약된 내역이 없습니다.</p>
                         <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>원하는 시간에 예약을 진행해보세요!</p>
@@ -81,7 +82,7 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                         })}
                     </div>
                 )}
-            </Card>
+            </div>
         </>
     );
 }

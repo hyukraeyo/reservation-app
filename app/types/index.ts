@@ -19,5 +19,6 @@ export interface Reservation {
   status: 'pending' | 'confirmed' | 'cancelled';
   profiles?: {
     email: string | null;
+    full_name?: string | null;
   } | null;
 }

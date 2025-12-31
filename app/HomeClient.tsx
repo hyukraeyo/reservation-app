@@ -171,9 +171,9 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
               {isSubscribing ? '구독 중...' : '알림 받기'}
             </button>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '100px' }}>
               {/* Service Selection UI */}
-              <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 {SERVICES.map((service) => (
                   <button
                     key={service.id}
@@ -182,23 +182,27 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                       setBookingTime(''); // Reset time when service changes
                     }}
                     style={{
-                      padding: '12px',
-                      borderRadius: '12px',
-                      border: selectedService.id === service.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)',
-                      background: selectedService.id === service.id ? 'var(--primary-light)' : 'var(--bg-card)',
-                      color: selectedService.id === service.id ? 'var(--primary-color)' : 'var(--text-main)',
+                      padding: '16px',
+                      borderRadius: '16px',
+                      border: selectedService.id === service.id ? '1px solid var(--primary-color)' : '1px solid transparent',
+                      background: 'var(--bg-card)',
+                      color: selectedService.id === service.id ? 'var(--primary-color)' : 'var(--text-secondary)',
                       cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
-                      gap: '4px',
-                      transition: 'all 0.2s',
+                      gap: '6px',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      boxShadow: selectedService.id === service.id
+                        ? '0 0 0 1px var(--primary-color), 0 4px 12px rgba(0,0,0,0.05)'
+                        : 'var(--shadow-sm)',
+                      transform: selectedService.id === service.id ? 'translateY(-2px)' : 'none',
                     }}
                   >
-                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{service.name}</span>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>{service.duration}분</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em', color: selectedService.id === service.id ? 'currentColor' : 'var(--text-main)' }}>{service.name}</span>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.8, fontWeight: 500 }}>{service.duration}분</span>
                   </button>
                 ))}
               </div>
@@ -215,31 +219,29 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                 onDateChange={handleDateChange}
                 duration={selectedService.duration}
               />
-              <button
-                onClick={book}
-                disabled={!bookingTime || isBooking}
-                className={styles.secondaryButton}
-                style={{
-                  width: '100%',
-                  opacity: (!bookingTime || isBooking) ? 0.6 : 1,
-                  cursor: (!bookingTime || isBooking) ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                {isBooking ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>처리 중...</span>
-                  </>
-                ) : `${selectedService.name} 예약하기`}
-              </button>
+              <div className={styles.floatingActionContainer}>
+                <button
+                  onClick={book}
+                  disabled={!bookingTime || isBooking}
+                  className={styles.floatingButton}
+                  style={{
+                    opacity: (!bookingTime || isBooking) ? 0.6 : 1,
+                    cursor: (!bookingTime || isBooking) ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isBooking ? (
+                    <>
+                      <div className="spinner"></div>
+                      <span>처리 중...</span>
+                    </>
+                  ) : `${selectedService.name} 예약하기`}
+                </button>
+              </div>
             </div>
           )}
         </>
-      )}
-    </main>
+      )
+      }
+    </main >
   );
 }
