@@ -52,7 +52,7 @@ export async function getUsers() {
   const { data: profiles, error } = await supabase
     .from('profiles')
     .select('*')
-  
+
   if (error) throw new Error(error.message)
   return profiles
 }
@@ -71,7 +71,7 @@ export async function updateUserRole(userId: string, newRole: string) {
     .eq('id', userId)
 
   if (error) return { error: error.message }
-  
+
   revalidatePath('/admin/users')
   return { success: true }
 }
@@ -84,7 +84,7 @@ export async function getReservations(): Promise<Reservation[]> {
   if (!isAdmin) throw new Error('권한이 없습니다.')
 
   const supabase = await createClient()
-  
+
   const { data, error } = await supabase
     .from('reservations')
     .select(`
@@ -96,7 +96,7 @@ export async function getReservations(): Promise<Reservation[]> {
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  
+
   return data as unknown as Reservation[]
 }
 
@@ -104,14 +104,14 @@ export async function getReservations(): Promise<Reservation[]> {
  * 예약 상태를 변경하고 고객에게 알림을 보냅니다. (관리자 전용)
  */
 export async function updateReservationStatus(
-  reservationId: string, 
+  reservationId: string,
   status: 'confirmed' | 'cancelled'
 ) {
   const isAdmin = await checkAdmin()
   if (!isAdmin) throw new Error('권한이 없습니다.')
 
   const supabase = await createClient()
-  
+
   const { data: reservation, error } = await supabase
     .from('reservations')
     .update({ status })
@@ -120,16 +120,16 @@ export async function updateReservationStatus(
     .single()
 
   if (error) return { error: error.message }
-  
+
   // 고객에게 알림 전송
   try {
     const subscription = reservation.profiles?.push_subscription
     if (subscription) {
       const title = status === 'confirmed' ? '예약이 확정되었습니다!' : '예약이 취소되었습니다.'
-      const body = status === 'confirmed' 
+      const body = status === 'confirmed'
         ? `신청하신 ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 승인되었습니다.`
         : `죄송합니다. ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 취소되었습니다.`
-      
+
       await sendPushNotification(subscription, title, body, '/')
     }
   } catch (err) {

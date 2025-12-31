@@ -14,13 +14,14 @@ import { urlBase64ToUint8Array } from '@/utils/helpers';
 interface HomeClientProps {
   initialUserEmail: string | null;
   initialIsAdmin: boolean;
+  initialReservedSlots: string[];
 }
 
-export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeClientProps) {
+export default function HomeClient({ initialUserEmail, initialIsAdmin, initialReservedSlots = [] }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [bookingTime, setBookingTime] = useState('');
-  const [reservedSlots, setReservedSlots] = useState<string[]>([]);
+  const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
 
   const userEmail = initialUserEmail;
   const isAdmin = initialIsAdmin;
@@ -143,9 +144,9 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
       )}
 
       {isLoading ? (
-        <div className="pageLoader">
+        <div className={styles.contentLoader}>
           <div className="largeSpinner"></div>
-          <div className="loadingText">정보를 불러오는 중...</div>
+          <div className="loadingText">예약 가능 여부를 확인하고 있습니다...</div>
         </div>
       ) : (
         <>
