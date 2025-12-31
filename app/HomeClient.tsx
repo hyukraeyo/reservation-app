@@ -42,14 +42,21 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin }: HomeCli
 
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window && process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.pushManager.getSubscription().then((subscription) => {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(() => navigator.serviceWorker.ready)
+        .then((registration) => {
+          return registration.pushManager.getSubscription();
+        })
+        .then((subscription) => {
           setIsSubscribed(!!subscription);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        })
+        .finally(() => {
           setIsLoading(false);
         });
-      }).catch(() => {
-        setTimeout(() => setIsLoading(false), 0);
-      });
     } else {
       setTimeout(() => setIsLoading(false), 0);
     }
