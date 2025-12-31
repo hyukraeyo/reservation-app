@@ -4,7 +4,11 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import styles from './ThemeToggle.module.scss'
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+}
+
+export function ThemeToggle({ className }: ThemeToggleProps) {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
 
@@ -18,20 +22,20 @@ export function ThemeToggle() {
 
   return (
     <button
-      className={styles.toggle}
+      className={`${styles.toggle} ${className || ''}`}
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       aria-label="테마 변경"
     >
       {theme === 'dark' ? (
         // Modern Sun Icon
-        <svg 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
           strokeLinejoin="round"
         >
           <circle cx="12" cy="12" r="5" />
@@ -46,14 +50,14 @@ export function ThemeToggle() {
         </svg>
       ) : (
         // Modern Moon Icon
-        <svg 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
           strokeLinejoin="round"
         >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />

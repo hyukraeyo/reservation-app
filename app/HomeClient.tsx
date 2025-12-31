@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, useCallback } from 'react';
+import { useState, useEffect, useTransition, useCallback, useRef } from 'react';
 import { saveSubscription, createReservation, getReservationsByDate } from './actions';
 import { createClient } from '@/utils/supabase/client';
 import styles from './home.module.scss';
@@ -29,6 +29,26 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
   const [selectedService, setSelectedService] = useState(SERVICES[0]);
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        setShowHeader(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+        setShowHeader(false);
+      } else if (currentScrollY < lastScrollY.current) {
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const userEmail = initialUserEmail;
   const userName = initialUserName;
@@ -133,9 +153,11 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
       <ToastContainer toasts={toasts} />
 
       {userEmail && (
-        <div className={styles.userInfo}>
+        <div className={`${styles.userInfo} ${!showHeader ? styles.headerHidden : ''}`}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className={styles.userEmail}>{userName || userEmail.split('@')[0]}님</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <Link href="/my" className={styles.myPageLink}>
               내 예약
             </Link>
@@ -144,9 +166,9 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                 Admin
               </Link>
             )}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <ThemeToggle />
+
+            {/* <ThemeToggle /> */}
+
             {process.env.NODE_ENV === 'development' && (
               <button onClick={handleLogout} className={styles.logoutButton}>
                 로그아웃
@@ -173,7 +195,7 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
               {isSubscribing ? '구독 중...' : '알림 받기'}
             </button>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '100px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '40px' }}>
               {/* Service Selection UI */}
               <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 {SERVICES.map((service) => (
@@ -221,14 +243,22 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                 onDateChange={handleDateChange}
                 duration={selectedService.duration}
               />
-              <div className={styles.floatingActionContainer}>
+              <div
+                className={styles.floatingActionContainer}
+                style={{
+                  transform: bookingTime ? 'translateY(0)' : 'translateY(2rem)',
+                  opacity: bookingTime ? 1 : 0,
+                  visibility: bookingTime ? 'visible' : 'hidden',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+              >
                 <button
                   onClick={book}
                   disabled={!bookingTime || isBooking}
                   className={styles.floatingButton}
                   style={{
-                    opacity: (!bookingTime || isBooking) ? 0.6 : 1,
-                    cursor: (!bookingTime || isBooking) ? 'not-allowed' : 'pointer',
+                    opacity: isBooking ? 0.8 : 1,
+                    cursor: isBooking ? 'wait' : 'pointer',
                   }}
                 >
                   {isBooking ? (
@@ -242,8 +272,9 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
             </div>
           )}
         </>
-      )
-      }
-    </main >
+      )}
+
+      {/* <ThemeToggle className={styles.floatingThemeToggle} /> */}
+    </main>
   );
 }

@@ -37,7 +37,7 @@ export default async function AdminLayout({
           <Link href="/" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600 }}>앱으로 돌아가기</Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <AdminLogoutButton />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
           </div>
         </div>
       </header>

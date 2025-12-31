@@ -55,13 +55,23 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     if (initialValue) {
       const date = new Date(initialValue);
       if (!isNaN(date.getTime())) {
-        setSelectedDate(date);
-        setCurrentMonth(date);
+        // Only update selectedDate if it's a different day to avoid regenerating timeSlots and resetting scroll
+        setSelectedDate(prev => (!prev || !isSameDay(date, prev) ? date : prev));
+
+        // Only update current month if different (optional, but good for UX)
+        setCurrentMonth(prev => (!isSameMonth(date, prev) ? date : prev));
+
         setSelectedTime(format(date, 'HH:mm'));
-        onDateChange?.(date);
+
+        // We might want to call onDateChange only if day changed, but the prop implies it handles date changes.
+        // If we strictly follow limiting updates:
+        if (!selectedDate || !isSameDay(date, selectedDate)) {
+          onDateChange?.(date);
+        }
       }
     }
-  }, [initialValue, onDateChange]);
+  }, [initialValue, onDateChange]); // removed selectedDate from dependency to avoid complications, but logic uses functional updates or check inside
+
 
   // Scroll to time section when date is selected
   useEffect(() => {

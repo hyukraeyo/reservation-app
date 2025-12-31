@@ -43,6 +43,12 @@
   }
 }
 
+.headerHidden {
+  transform: translateY(-200%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .adminLink {
   margin-left: 8px;
   color: var(--button-text);
@@ -54,10 +60,12 @@
   font-size: 0.75rem;
   transition: all 0.2s;
   
-  &:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.2);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.2);
+    }
   }
 }
 
@@ -73,12 +81,14 @@
   transition: all 0.2s;
   border: 1px solid transparent;
 
-  &:hover {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-    color: var(--primary-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
   }
 }
 
@@ -94,10 +104,12 @@
   font-size: 0.75rem;
   transition: all 0.2s;
 
-  &:hover {
-    color: var(--error-text);
-    border-color: var(--error-bg);
-    background: var(--error-bg);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--error-text);
+      border-color: var(--error-bg);
+      background: var(--error-bg);
+    }
   }
 }
 
@@ -120,8 +132,10 @@
   gap: 1.25rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  &:hover {
-    box-shadow: var(--shadow-md);
+  @media (hover: hover) {
+    &:hover {
+      box-shadow: var(--shadow-md);
+    }
   }
 
   @media (max-width: 480px) {
@@ -140,11 +154,13 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
 
-  &:hover {
-    background: var(--bg-card);
-    border-color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.1);
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bg-card);
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.1);
+    }
   }
 
   @media (max-width: 480px) {
@@ -191,11 +207,13 @@
   margin-top: 1.5rem;
   transition: all 0.2s;
 
-  &:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: var(--bg-card);
-    transform: translateY(-1px);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--bg-card);
+      transform: translateY(-1px);
+    }
   }
 }
 
@@ -377,7 +395,7 @@
 /* Core Layout & Button Styles */
 .container {
   min-height: 100vh;
-  padding: 8rem 2rem 10rem;
+  padding: 8rem 2rem 6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -387,7 +405,7 @@
     radial-gradient(circle at bottom left, rgba(var(--shadow-color), 0.06), transparent 40%);
   
   @media (max-width: 480px) {
-    padding: 7rem 1rem 10rem; /* Same layout logic as before, just colors reverted */
+    padding: 7rem 1rem 6rem; /* Reduced bottom padding */
   }
 }
 
@@ -404,10 +422,12 @@
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   letter-spacing: -0.01em;
   
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px -5px rgba(var(--shadow-color), 0.4);
-    filter: brightness(1.05);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px -5px rgba(var(--shadow-color), 0.4);
+      filter: brightness(1.05);
+    }
   }
   
   &:active {
@@ -477,13 +497,39 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
   
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
   }
 }
 
 @keyframes slideUp {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+.floatingThemeToggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1001;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 480px) {
+    /* Position above the floating reservation button (which is ~50-60px high + 1.5-2rem padding) */
+    bottom: 6rem; 
+    right: 1.5rem;
+  }
 }
