@@ -246,7 +246,7 @@ export async function cancelMyReservation(reservationId: string) {
   // Check if the reservation belongs to the user
   const { data: reservation, error: fetchError } = await supabase
     .from('reservations')
-    .select('id, user_id, time')
+    .select('id, user_id, time, status')
     .eq('id', reservationId)
     .single();
 
