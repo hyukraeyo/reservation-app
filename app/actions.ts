@@ -219,5 +219,57 @@ export async function cancelMyReservation(reservationId: string) {
     throw new Error('예약 취소 중 오류가 발생했습니다.');
   }
 
+  // 1. Notify Admins about the cancellation
+  try {
+    const { data: admins } = await supabase
+      .from('profiles')
+      .select('push_subscription')
+      .in('role', ['owner', 'admin'])
+      .not('push_subscription', 'is', null);
+
+    if (admins?.length) {
+      const timeStr = new Date(reservation.time).toLocaleString('ko-KR', {
+        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      await Promise.allSettled(
+        admins.map(admin =>
+          sendPushNotification(
+            admin.push_subscription,
+            '예약 취소 알림',
+            `${user.email}님이 ${timeStr} 예약을 취소했습니다.`,
+            '/admin/reservations'
+          )
+        )
+      );
+    }
+  } catch (err) {
+    console.error('Admin cancellation notification failed:', err);
+  }
+
+  // 2. Notify User (Confirmation)
+  try {
+    const { data: currentUserProfile } = await supabase
+      .from('profiles')
+      .select('push_subscription')
+      .eq('id', user.id)
+      .single();
+
+    if (currentUserProfile?.push_subscription) {
+      const timeStr = new Date(reservation.time).toLocaleString('ko-KR', {
+        month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      await sendPushNotification(
+        currentUserProfile.push_subscription,
+        '예약 취소 완료',
+        `${timeStr} 예약이 정상적으로 취소되었습니다.`,
+        '/my'
+      );
+    }
+  } catch (err) {
+    console.error('User cancellation notification failed:', err);
+  }
+
   return { success: true };
 }
