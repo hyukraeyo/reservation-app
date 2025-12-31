@@ -1,0 +1,28 @@
+// Skeleton 애니메이션 - Loading UI용
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary, #f0f0f0) 25%,
+    var(--bg-tertiary, #e0e0e0) 50%,
+    var(--bg-secondary, #f0f0f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: 4px;
+}
+
+.cardSkeleton {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #eee);
+  border-radius: 16px;
+  padding: 1.5rem;
+}

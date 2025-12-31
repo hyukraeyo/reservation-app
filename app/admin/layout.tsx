@@ -10,8 +10,11 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const isAdmin = await checkAdmin()
-  const isSuperAdmin = await checkSuperAdmin()
+  // 병렬 권한 체크 (Promise.all) - Next.js 공식 권장 패턴
+  const [isAdmin, isSuperAdmin] = await Promise.all([
+    checkAdmin(),
+    checkSuperAdmin(),
+  ])
 
   if (!isAdmin) {
     redirect('/')

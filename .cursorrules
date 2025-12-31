@@ -37,11 +37,52 @@
 - **공용 컴포넌트**: 재사용 가능한 컴포넌트는 `app/components/`에 배치한다.
 - **스타일 모듈**: 각 컴포넌트에 대응하는 `*.module.scss` 파일을 함께 생성한다.
 
-## 7. 린팅 및 코드 검사
+## 7. 성능 최적화 패턴 (CRITICAL)
+
+### 7.1 데이터 로딩 위치
+- **`page.tsx`에서 데이터 로딩**: 모든 데이터 호출은 `page.tsx` (최상위 서버 컴포넌트)에서 수행한다.
+- **하위 컴포넌트는 props로 수신**: 하위 컴포넌트는 데이터를 직접 fetch하지 않고, props로 전달받아 렌더링만 담당한다.
+
+```
+# 올바른 패턴
+page.tsx (async, 데이터 로딩)
+    ↓ props 전달
+Component.tsx (렌더링만 담당)
+
+# 잘못된 패턴 ❌
+page.tsx → Component.tsx (내부에서 async fetch)
+```
+
+### 7.2 병렬 데이터 로딩
+- **`Promise.all()` 사용**: 독립적인 데이터 호출은 반드시 병렬로 실행한다.
+- **Waterfall 방지**: 순차적 await 체인을 지양한다.
+
+```typescript
+// ✅ 올바른 패턴
+const [reservations, profile] = await Promise.all([
+  getReservations(),
+  getProfile(),
+]);
+
+// ❌ 잘못된 패턴
+const reservations = await getReservations();
+const profile = await getProfile();
+```
+
+### 7.3 로딩 UI
+- **`loading.tsx` 필수**: 각 라우트 폴더에 `loading.tsx`를 배치하여 스켈레톤 UI를 제공한다.
+- **Streaming 활용**: Next.js가 자동으로 Suspense 경계를 생성하여 점진적 렌더링을 수행한다.
+
+### 7.4 Server/Client 분리
+- **Server Component**: 데이터 로딩, 권한 체크, 정적 UI
+- **Client Component**: 실시간 업데이트, 이벤트 핸들링, 상태 관리
+- **초기 데이터 패턴**: Server에서 초기 데이터를 로드하고, Client에서 실시간 업데이트를 구독한다.
+
+## 8. 린팅 및 코드 검사
 - **린트 통과 필수**: 모든 커밋 전 `npm run lint`를 실행하여 에러가 없어야 한다.
 - **ESLint 9**: Next.js 16 권장 설정을 따른다.
 - **경고 처리**: 경고(warning)도 가급적 해결한다.
 
-## 8. 문서화
+## 9. 문서화
 - **JSDoc 주석**: 주요 함수에는 한글 JSDoc 주석을 작성한다.
 - **README 동기화**: 주요 기능 변경 시 README.md를 업데이트한다.

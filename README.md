@@ -31,21 +31,99 @@
 
 ```
 app/
-├── admin/              # 관리자 대시보드
-│   ├── AdminDashboard.tsx  # 통합 관리 화면
-│   ├── reservations/   # 예약 관리
-│   └── users/          # 사용자 관리 (admin 전용)
-├── components/         # 공용 컴포넌트
+├── admin/                    # 관리자 대시보드
+│   ├── page.tsx              # 데이터 로딩 (Server Component)
+│   ├── loading.tsx           # 스켈레톤 로딩 UI
+│   ├── AdminDashboard.tsx    # 렌더링 컴포넌트
+│   ├── LiveReservationList.tsx # 실시간 업데이트 (Client)
+│   ├── reservations/         # 예약 관리
+│   │   ├── page.tsx
+│   │   └── loading.tsx
+│   └── users/                # 사용자 관리 (admin 전용)
+│       ├── page.tsx
+│       └── loading.tsx
+├── my/                       # 내 예약 페이지
+│   ├── page.tsx
+│   └── loading.tsx
+├── components/               # 공용 컴포넌트
 │   ├── Card.tsx
+│   ├── Skeleton.tsx          # 스켈레톤 컴포넌트
 │   └── ThemeToggle.tsx
-├── types/              # TypeScript 타입 정의
-├── HomeClient.tsx      # 메인 예약 화면
-└── layout.tsx          # 루트 레이아웃
+├── types/                    # TypeScript 타입 정의
+├── page.tsx                  # 메인 페이지 (데이터 로딩)
+├── loading.tsx               # 메인 로딩 UI
+├── HomeClient.tsx            # 메인 예약 화면
+└── layout.tsx                # 루트 레이아웃
 
 utils/
-├── push.ts             # 웹 푸시 알림 유틸
-└── supabase/           # Supabase 클라이언트
+├── push.ts                   # 웹 푸시 알림 유틸
+└── supabase/                 # Supabase 클라이언트
 ```
+
+## ⚡ 성능 최적화 패턴 (Next.js App Router)
+
+### 1. 데이터 로딩은 `page.tsx`에서
+
+Next.js 공식 권장 패턴에 따라, **데이터 호출은 `page.tsx` (최상위 서버 컴포넌트)**에서 수행합니다.
+
+```
+# 올바른 패턴
+page.tsx (데이터 로딩)
+    ↓ props 전달
+Component.tsx (렌더링만 담당)
+
+# 잘못된 패턴 ❌
+page.tsx → Component.tsx (내부에서 데이터 로딩)
+```
+
+### 2. 병렬 데이터 로딩 (`Promise.all`)
+
+독립적인 데이터는 순차 호출 대신 **병렬 호출**로 로딩 시간을 단축합니다.
+
+```typescript
+// ✅ 올바른 패턴 - 병렬 로딩
+const [reservations, profile] = await Promise.all([
+  getReservations(),
+  getProfile(),
+]);
+
+// ❌ 잘못된 패턴 - 순차 로딩 (Waterfall)
+const reservations = await getReservations();
+const profile = await getProfile();
+```
+
+### 3. `loading.tsx`로 즉각 로딩 UI 제공
+
+각 라우트 폴더에 `loading.tsx`를 배치하면 Next.js가 자동으로 Suspense 경계를 생성합니다.
+
+```
+app/
+├── admin/
+│   ├── page.tsx        # 데이터 로딩
+│   ├── loading.tsx     # 스켈레톤 UI
+│   └── AdminDashboard.tsx  # 렌더링
+```
+
+### 4. Server/Client 컴포넌트 분리
+
+- **Server Component**: 데이터 로딩, 정적 UI
+- **Client Component**: 실시간 업데이트, 이벤트 핸들링
+
+```typescript
+// page.tsx (Server) - 초기 데이터 로딩
+export default async function Page() {
+  const data = await getData();
+  return <ClientComponent initialData={data} />;
+}
+
+// ClientComponent.tsx - 실시간 업데이트만 담당
+'use client'
+export default function ClientComponent({ initialData }) {
+  const [data, setData] = useState(initialData);
+  // 실시간 구독 로직...
+}
+```
+
 
 ## 🚀 시작하기
 
@@ -113,6 +191,11 @@ npm start
 - Server Components 기본
 - 상호작용이 필요할 때만 `'use client'`
 - 공용 컴포넌트는 `app/components/`에 배치
+
+### 성능 (CRITICAL)
+- **데이터 로딩은 `page.tsx`에서** - 하위 컴포넌트는 props로만 수신
+- **`Promise.all()` 활용** - 독립적 데이터는 병렬 로딩
+- **`loading.tsx` 필수** - 각 라우트에 스켈레톤 UI 제공
 
 ### 타입
 - `any` 대신 적절한 타입 명시

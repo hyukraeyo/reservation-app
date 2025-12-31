@@ -15,27 +15,23 @@ export default async function Home() {
     redirect('/login');
   }
 
-  let isAdmin = false;
-  let userName = null;
+  // 병렬 데이터 로딩 (Promise.all) - Next.js 공식 권장 패턴
+  const today = new Date().toISOString();
 
-  if (user.email) {
-    const { data: profile } = await supabase
+  const [profileResult, initialReservedSlots] = await Promise.all([
+    // 프로필 조회
+    supabase
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single();
+      .single(),
+    // 오늘 예약 슬롯 조회
+    getReservationsByDate(today),
+  ]);
 
-    if (profile) {
-      if (profile.role === 'admin' || profile.role === 'owner') {
-        isAdmin = true;
-      }
-      userName = profile.full_name;
-    }
-  }
-
-  // Pre-fetch today's reservations
-  const today = new Date().toISOString();
-  const initialReservedSlots = await getReservationsByDate(today);
+  const profile = profileResult.data;
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'owner';
+  const userName = profile?.full_name ?? null;
 
   return (
     <HomeClient
