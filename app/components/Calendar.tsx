@@ -68,7 +68,11 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
         if (!selectedDate || !isSameDay(date, selectedDate)) {
           onDateChange?.(date);
         }
+      } else {
+        setSelectedTime(null);
       }
+    } else {
+      setSelectedTime(null);
     }
   }, [initialValue, onDateChange]); // removed selectedDate from dependency to avoid complications, but logic uses functional updates or check inside
 
