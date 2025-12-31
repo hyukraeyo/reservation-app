@@ -36,7 +36,7 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                         {initialReservations.map((reservation) => {
                             const reservationDate = new Date(reservation.time);
                             const isPast = reservationDate < now;
-                            const canCancel = reservation.status !== 'cancelled' && !isPast;
+                            const canCancel = reservation.status !== 'cancelled' && reservation.status !== 'confirmed' && !isPast;
                             const isCancelled = reservation.status === 'cancelled';
                             const isConfirmed = reservation.status === 'confirmed';
 

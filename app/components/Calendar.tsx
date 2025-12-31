@@ -27,9 +27,10 @@ interface CalendarProps {
   initialValue?: string;
   reservedSlots?: string[];
   onDateChange?: (date: Date) => void;
+  duration?: number; // duration in minutes, default 30
 }
 
-export default function Calendar({ onSelect, initialValue, reservedSlots = [], onDateChange }: CalendarProps) {
+export default function Calendar({ onSelect, initialValue, reservedSlots = [], onDateChange, duration = 30 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -39,6 +40,9 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     new Set(reservedSlots.map(iso => format(new Date(iso), 'HH:mm'))),
     [reservedSlots]
   );
+
+  // Calculate blocks needed (e.g., 60m -> 2 blocks of 30m)
+  const blocksNeeded = Math.ceil(duration / 30);
 
   useEffect(() => {
     if (initialValue) {
@@ -80,23 +84,62 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     const isTodayDate = isToday(selectedDate);
     const now = new Date();
 
+    // Define business hours: 10:00 to 20:00 (Last booking slot depends on duration)
+    // Basic slots are 10:00, 10:30, ... 19:30? (If close at 20:00)
+    // Let's generate all 30-min slots from 10:00 to 19:30 (since 20:00 is close time)
+
+    // Generate all base slots first
+    const allBaseSlots: string[] = [];
     for (let hour = 10; hour <= 20; hour++) {
       [0, 30].forEach(minutes => {
-        if (hour === 20 && minutes === 30) return; // End at 20:00 or as defined
+        if (hour === 20 && minutes > 0) return; // Allow 20:00? Usually 20:00 is close. So last slot is 19:30.
+        // If strictly closing at 20:00, 19:30 is last 30m slot.
+        // If 20:00 is allowed as start time, then open till 20:30? 
+        // Previous code had: `if (hour === 20 && minutes === 30) return;` -> allowed 20:00.
+        // Let's stick to existing logic: 10:00 ... 20:00.
 
-        const timeString = `${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-        const slotDate = setMinutes(setHours(selectedDate, hour), minutes);
-
-        if (isTodayDate && isBefore(slotDate, now)) return;
-
-        slots.push({
-          time: timeString,
-          disabled: reservedTimeSet.has(timeString)
-        });
+        if (hour === 20 && minutes === 30) return;
+        allBaseSlots.push(`${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
       });
     }
+
+    // Map base slots to disabled status
+    allBaseSlots.forEach((timeString, index) => {
+      const [h, m] = timeString.split(':').map(Number);
+      const slotDate = setMinutes(setHours(selectedDate, h), m);
+
+      let isDisabled = false;
+
+      // 1. Check past time
+      if (isTodayDate && isBefore(slotDate, now)) {
+        isDisabled = true;
+      }
+
+      // 2. Check if this slot OR required future slots are occupied or out of bounds
+      if (!isDisabled) {
+        for (let i = 0; i < blocksNeeded; i++) {
+          // Check bounds
+          if (index + i >= allBaseSlots.length) {
+            isDisabled = true;
+            break;
+          }
+          const checkTimeStr = allBaseSlots[index + i];
+          // Check reservation
+          if (reservedTimeSet.has(checkTimeStr)) {
+            isDisabled = true;
+            break;
+          }
+        }
+      }
+
+      slots.push({
+        time: timeString,
+        disabled: isDisabled
+      });
+    });
+
     return slots;
-  }, [selectedDate, reservedTimeSet]);
+  }, [selectedDate, reservedTimeSet, blocksNeeded]);
 
   const renderHeader = () => {
     return (

@@ -1,0 +1,3 @@
+ALTER TABLE public.reservations 
+ADD COLUMN IF NOT EXISTS service_name TEXT DEFAULT '기본 시술',
+ADD COLUMN IF NOT EXISTS duration INTEGER DEFAULT 30;

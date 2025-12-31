@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect, useTransition, useCallback } from 'react';
 import { saveSubscription, createReservation, getReservationsByDate } from './actions';
@@ -11,26 +11,34 @@ import Calendar from '@/app/components/Calendar';
 import { useToast, ToastContainer } from '@/app/components/Toast';
 import { urlBase64ToUint8Array } from '@/utils/helpers';
 
+const SERVICES = [
+  { id: 'perm', name: '수분펌', duration: 30, price: '30,000원' },
+  { id: 'extension', name: '속눈썹 연장', duration: 60, price: '50,000원' },
+];
+
 interface HomeClientProps {
   initialUserEmail: string | null;
+  initialUserName: string | null;
   initialIsAdmin: boolean;
   initialReservedSlots: string[];
 }
 
-export default function HomeClient({ initialUserEmail, initialIsAdmin, initialReservedSlots = [] }: HomeClientProps) {
+export default function HomeClient({ initialUserEmail, initialUserName, initialIsAdmin, initialReservedSlots = [] }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
+  const [selectedService, setSelectedService] = useState(SERVICES[0]);
 
   const userEmail = initialUserEmail;
+  const userName = initialUserName;
   const isAdmin = initialIsAdmin;
 
   const [isSubscribing, startSubscribing] = useTransition();
   const [isBooking, startBooking] = useTransition();
 
   const router = useRouter();
-  const { toasts, addToast, removeToast } = useToast();
+  const { toasts, addToast } = useToast();
 
   const handleDateChange = useCallback(async (date: Date) => {
     try {
@@ -103,8 +111,8 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
     startBooking(async () => {
       const date = new Date(bookingTime);
       try {
-        await createReservation(date);
-        addToast('예약되었습니다! 1시간 전에 알림을 보내드릴게요.', 'success');
+        await createReservation(date, selectedService.name, selectedService.duration);
+        addToast(`${selectedService.name} 예약이 완료되었습니다! 1시간 전에 알림을 보내드릴게요.`, 'success');
         await handleDateChange(date);
         setBookingTime('');
       } catch (e: unknown) {
@@ -127,7 +135,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
       {userEmail && (
         <div className={styles.userInfo}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className={styles.userEmail}>{userEmail}</span>
+            <span className={styles.userEmail}>{userName || userEmail.split('@')[0]}님</span>
             <Link href="/my" className={styles.myPageLink}>
               내 예약
             </Link>
@@ -164,6 +172,37 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
             </button>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px' }}>
+              {/* Service Selection UI */}
+              <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {SERVICES.map((service) => (
+                  <button
+                    key={service.id}
+                    onClick={() => {
+                      setSelectedService(service);
+                      setBookingTime(''); // Reset time when service changes
+                    }}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: selectedService.id === service.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)',
+                      background: selectedService.id === service.id ? 'var(--primary-light)' : 'var(--bg-card)',
+                      color: selectedService.id === service.id ? 'var(--primary-color)' : 'var(--text-main)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      transition: 'all 0.2s',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{service.name}</span>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>{service.duration}분</span>
+                  </button>
+                ))}
+              </div>
+
               {!isSubscribed && process.env.NODE_ENV === 'development' && (
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '-0.5rem' }}>
                   (개발 모드: 알림 구독 없이 예약 기능을 테스트할 수 있습니다)
@@ -174,6 +213,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
                 initialValue={bookingTime}
                 reservedSlots={reservedSlots}
                 onDateChange={handleDateChange}
+                duration={selectedService.duration}
               />
               <button
                 onClick={book}
@@ -194,7 +234,7 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
                     <div className="spinner"></div>
                     <span>처리 중...</span>
                   </>
-                ) : '예약하기'}
+                ) : `${selectedService.name} 예약하기`}
               </button>
             </div>
           )}

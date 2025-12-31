@@ -16,16 +16,20 @@ export default async function Home() {
   }
 
   let isAdmin = false;
+  let userName = null;
 
   if (user.email) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, full_name')
       .eq('id', user.id)
       .single();
 
-    if (profile?.role === 'admin' || profile?.role === 'owner') {
-      isAdmin = true;
+    if (profile) {
+      if (profile.role === 'admin' || profile.role === 'owner') {
+        isAdmin = true;
+      }
+      userName = profile.full_name;
     }
   }
 
@@ -36,6 +40,7 @@ export default async function Home() {
   return (
     <HomeClient
       initialUserEmail={user.email ?? null}
+      initialUserName={userName}
       initialIsAdmin={isAdmin}
       initialReservedSlots={initialReservedSlots}
     />
