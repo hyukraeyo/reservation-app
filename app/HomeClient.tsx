@@ -147,9 +147,11 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <ThemeToggle />
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              로그아웃
-            </button>
+            {process.env.NODE_ENV === 'development' && (
+              <button onClick={handleLogout} className={styles.logoutButton}>
+                로그아웃
+              </button>
+            )}
           </div>
         </div>
       )}
