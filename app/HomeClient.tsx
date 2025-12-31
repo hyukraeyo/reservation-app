@@ -128,6 +128,9 @@ export default function HomeClient({ initialUserEmail, initialIsAdmin, initialRe
         <div className={styles.userInfo}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className={styles.userEmail}>{userEmail}</span>
+            <Link href="/my" className={styles.myPageLink}>
+              내 예약
+            </Link>
             {isAdmin && (
               <Link href="/admin" className={styles.adminLink}>
                 Admin

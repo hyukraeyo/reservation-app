@@ -153,3 +153,71 @@ export async function createReservation(time: Date) {
 
   return reservation;
 }
+
+/**
+ * Fetches the current user's reservation history.
+ */
+export async function getMyReservations() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('인증되지 않은 사용자입니다.');
+  }
+
+  const { data, error } = await supabase
+    .from('reservations')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('time', { ascending: false });
+
+  if (error) {
+    console.error('Failed to fetch my reservations:', error);
+    return [];
+  }
+
+  return data;
+}
+
+/**
+ * Allows a user to cancel their own reservation.
+ */
+export async function cancelMyReservation(reservationId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('인증되지 않은 사용자입니다.');
+  }
+
+  // Check if the reservation belongs to the user
+  const { data: reservation, error: fetchError } = await supabase
+    .from('reservations')
+    .select('id, user_id, time')
+    .eq('id', reservationId)
+    .single();
+
+  if (fetchError || !reservation) {
+    throw new Error('예약을 찾을 수 없습니다.');
+  }
+
+  if (reservation.user_id !== user.id) {
+    throw new Error('본인의 예약만 취소할 수 있습니다.');
+  }
+
+  // Prevent cancelling past reservations
+  if (new Date(reservation.time) < new Date()) {
+    throw new Error('이미 지난 예약은 취소할 수 없습니다.');
+  }
+
+  const { error } = await supabase
+    .from('reservations')
+    .update({ status: 'cancelled' })
+    .eq('id', reservationId);
+
+  if (error) {
+    throw new Error('예약 취소 중 오류가 발생했습니다.');
+  }
+
+  return { success: true };
+}
