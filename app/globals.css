@@ -19,7 +19,7 @@
   --input-border: #cbd5e1;         /* Slate 300 */
   
   --button-text: #ffffff;
-  --button-gradient: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+  --button-gradient: var(--primary-color);
   
   --success-bg: #dcfce7;
   --success-text: #166534;
@@ -52,7 +52,7 @@
   --input-border: #475569;         /* Slate 600 */
   
   --button-text: #0f172a;          /* Dark text for contrast on bright primary */
-  --button-gradient: linear-gradient(135deg, #2dd4bf 0%, #99f6e4 100%);
+  --button-gradient: var(--primary-color);
   
   --success-bg: #064e3b;
   --success-text: #dcfce7;
