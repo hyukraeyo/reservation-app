@@ -225,10 +225,12 @@
   align-items: center;
   justify-content: center;
   
-  &:hover:not(:disabled) {
-    border-color: var(--primary-color);
-    background: var(--bg-card);
-    color: var(--primary-color);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      border-color: var(--primary-color);
+      background: var(--bg-card);
+      color: var(--primary-color);
+    }
   }
 
   &.selected {
