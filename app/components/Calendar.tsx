@@ -128,16 +128,28 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
       }
 
       // 2. Check if this slot OR required future slots are occupied or out of bounds
+      // 영업 종료 시간: 20:30 (마지막 슬롯 20:00 + 30분)
       if (!isDisabled) {
-        for (let i = 0; i < blocksNeeded; i++) {
-          if (index + i >= allBaseSlots.length) {
-            isDisabled = true;
-            break;
-          }
-          const checkTimeStr = allBaseSlots[index + i];
-          if (reservedTimeSet.has(checkTimeStr)) {
-            isDisabled = true;
-            break;
+        // 서비스 종료 시간이 영업 종료(20:30)를 초과하는지 확인
+        const serviceEndMinutes = h * 60 + m + duration;
+        const closingTimeMinutes = 20 * 60 + 30; // 20:30
+
+        if (serviceEndMinutes > closingTimeMinutes) {
+          isDisabled = true;
+        }
+
+        // 필요한 슬롯들이 이미 예약되었는지 확인
+        if (!isDisabled) {
+          for (let i = 0; i < blocksNeeded; i++) {
+            if (index + i >= allBaseSlots.length) {
+              isDisabled = true;
+              break;
+            }
+            const checkTimeStr = allBaseSlots[index + i];
+            if (reservedTimeSet.has(checkTimeStr)) {
+              isDisabled = true;
+              break;
+            }
           }
         }
       }

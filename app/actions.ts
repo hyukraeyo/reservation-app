@@ -80,6 +80,19 @@ export async function createReservation(time: Date, serviceName: string = '기�
 
   if (!user) throw new Error("권한이 없습니다.");
 
+  // 영업 시간 체크 (10:00 ~ 20:30)
+  const hours = time.getHours();
+  const minutes = time.getMinutes();
+  const startTimeMinutes = hours * 60 + minutes;
+  const endTimeMinutes = startTimeMinutes + duration;
+
+  const openingTime = 10 * 60; // 10:00
+  const closingTime = 20 * 60 + 30; // 20:30
+
+  if (startTimeMinutes < openingTime || endTimeMinutes > closingTime) {
+    throw new Error("영업 시간(10:00~20:30) 내에만 예약이 가능합니다.");
+  }
+
   // Check for conflicts using existing slot logic
   // Since our business logic enforces a 30-min grid, checking against blocked slots is sufficient.
   const todayStr = time.toISOString();
