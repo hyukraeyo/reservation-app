@@ -31,12 +31,7 @@ export async function saveSubscription(subscription: PushSubscription) {
 
 /**
  * Fetches reserved time slots for a specific date.
- */
-/**
- * Fetches reserved time slots for a specific date.
- * Returns an array of blocked ISO ISOstrings or time strings? 
- * The current implementation returns ISO strings, but the Calendar converts them to HH:mm for Set lookup.
- * We should return ISO strings for all 30-min blocks that are occupied.
+ * Returns an array of ISO strings for all occupied 30-min blocks.
  */
 export async function getReservationsByDate(dateStr: string) {
   const supabase = await createClient();
@@ -84,30 +79,9 @@ export async function createReservation(time: Date, serviceName: string = '기�
 
   if (!user) throw new Error("권한이 없습니다.");
 
-  // Check collision for the entire duration
-  // We need to check if ANY existing reservation overlaps with [time, time + duration)
-  // Overlap condition: (StartA < EndB) and (EndA > StartB)
-
-  const newStart = time;
-  const newEnd = new Date(time.getTime() + duration * 60 * 1000);
-
-  // We fetch reservations for the day and check overlaps in JS for simplicity,
-  // or write a complex query. Since dataset is small per day, fetching day's reservations is fine.
-  // Actually, we can use the same logic as getReservationsByDate but expanded.
-  // Let's rely on database range check or just check against getReservationsByDate result?
-  // getReservationsByDate returns discrete 30min slots.
-  // If we try to book 60 mins at 10:00, we need 10:00 and 10:30 to be free.
-  // So we can check if any of the needed slots are in the blocked list.
-
-  // However, simpler to just query overlaps.
-  // Existing reservations: E_Start, E_End = E_Start + E_Duration
-  // New reservation: N_Start, N_End
-  // Overlap if: E_Start < N_End AND E_End > N_Start
-
-  // NOTE: Supabase/Postgres doesn't store dry end_time, so we compute it.
-  // Let's just check against the 'slots' logic because our business logic enforces 30-min grid.
+  // Check for conflicts using existing slot logic
+  // Since our business logic enforces a 30-min grid, checking against blocked slots is sufficient.
   const todayStr = time.toISOString();
-  // We need to fetch for the specific date
   const blockedSlots = await getReservationsByDate(todayStr);
   const blockedSet = new Set(blockedSlots.map(s => new Date(s).getTime()));
 

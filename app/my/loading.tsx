@@ -5,22 +5,14 @@ import loadingStyles from '@/app/loading.module.scss';
 export default function MyPageLoading() {
     return (
         <main className={styles.container}>
-            {/* Header skeleton */}
-            <header className={styles.userInfo} style={{ position: 'absolute' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className={loadingStyles.skeleton} style={{ width: '100px', height: '24px', borderRadius: '4px' }} />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div className={loadingStyles.skeleton} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                </div>
-            </header>
+            {/* Content - 헤더는 Root layout에서 렌더링되므로 제외 */}
+            <div className={myStyles.historyCard}>
+                {/* Title - 실제 텍스트 그대로 */}
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>
+                    내 예약 내역
+                </h2>
 
-            {/* Content skeleton */}
-            <div className={myStyles.historyCard} style={{ paddingTop: '120px' }}>
-                {/* Title skeleton */}
-                <div className={loadingStyles.skeleton} style={{ width: '160px', height: '1.75rem', borderRadius: '4px', marginBottom: '1.5rem', marginLeft: '0.5rem' }} />
-
-                {/* Reservation cards skeleton - 실제 UI와 동일한 구조 */}
+                {/* Reservation cards skeleton */}
                 <div className={myStyles.listContainer}>
                     {Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className={myStyles.reservationCard}>
@@ -33,14 +25,19 @@ export default function MyPageLoading() {
 
                             {/* Info Section */}
                             <div className={myStyles.infoSection}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <div className={loadingStyles.skeleton} style={{ width: '18px', height: '18px', borderRadius: '50%' }} />
-                                    <div className={loadingStyles.skeleton} style={{ width: '80px', height: '1.2rem', borderRadius: '4px' }} />
+                                <div className={myStyles.timeWrapper}>
+                                    <svg className={myStyles.timeIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <div className={loadingStyles.skeleton} style={{ width: '60px', height: '1.1rem', borderRadius: '4px' }} />
                                 </div>
-                                <div className={loadingStyles.skeleton} style={{ width: '70px', height: '28px', borderRadius: '100px', marginTop: '0.25rem' }} />
+                                <div className={myStyles.statusWrapper}>
+                                    <div className={loadingStyles.skeleton} style={{ width: '60px', height: '26px', borderRadius: '100px' }} />
+                                </div>
                             </div>
 
-                            {/* Action Section (모바일에서는 다른 위치) */}
+                            {/* Action Section */}
                             <div className={myStyles.actionSection}>
                                 <div className={loadingStyles.skeleton} style={{ width: '80px', height: '40px', borderRadius: '14px' }} />
                             </div>

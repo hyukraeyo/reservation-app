@@ -1,0 +1,125 @@
+.header {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-main);
+  box-shadow: var(--shadow-md);
+  font-size: 0.9rem;
+  max-width: 600px;
+  margin: 0 auto;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  opacity: 0.95;
+  view-transition-name: main-header;
+
+  @media (max-width: 480px) {
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+.hidden {
+  transform: translateY(-200%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userName {
+  font-weight: 700;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+
+  @media (max-width: 400px) {
+    max-width: 100px;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navLink {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 12px;
+  background: var(--bg-hover);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+.navLinkPrimary {
+  color: var(--button-text);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 4px 12px;
+  background: var(--primary-color);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(var(--shadow-color), 0.2);
+    }
+  }
+}
+
+.logoutButton {
+  margin-left: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  border-radius: 100px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--error-text);
+      border-color: var(--error-bg);
+      background: var(--error-bg);
+    }
+  }
+}

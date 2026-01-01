@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useEffect, useTransition, useCallback, useRef } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import { saveSubscription, createReservation, getReservationsByDate } from './actions';
-import { createClient } from '@/utils/supabase/client';
 import styles from './home.module.scss';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ThemeToggle } from '@/app/components/ThemeToggle';
 import Calendar from '@/app/components/Calendar';
 import { useToast, ToastContainer } from '@/app/components/Toast';
 import { urlBase64ToUint8Array } from '@/utils/helpers';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const SERVICES = [
   { id: 'moisture_perm', name: '수분펌', duration: 60, price: '40,000원' },
@@ -34,26 +32,6 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
   const [selectedService, setSelectedService] = useState(SERVICES[0]);
-  const [showHeader, setShowHeader] = useState(true);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY < 10) {
-        setShowHeader(true);
-      } else if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
-        setShowHeader(false);
-      } else if (currentScrollY < lastScrollY.current) {
-        setShowHeader(true);
-      }
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const userEmail = initialUserEmail;
   const userName = initialUserName;
@@ -136,47 +114,15 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
     });
   };
 
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/login');
-    router.refresh();
-  };
-
   return (
     <main className={styles.container}>
       <ToastContainer toasts={toasts} />
 
-      {userEmail && (
-        <div className={`${styles.userInfo} ${!showHeader ? styles.headerHidden : ''}`}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className={styles.userEmail}>{userName || userEmail.split('@')[0]}님</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link href="/my" className={styles.myPageLink}>
-              내 예약
-            </Link>
-            {isAdmin && (
-              <Link href="/admin" className={styles.adminLink}>
-                Admin
-              </Link>
-            )}
 
-            {/* <ThemeToggle /> */}
-
-            {process.env.NODE_ENV === 'development' && (
-              <button onClick={handleLogout} className={styles.logoutButton}>
-                로그아웃
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {isLoading ? (
         <div className={styles.contentLoader}>
-          <div className="largeSpinner"></div>
-          <div className="loadingText">예약 가능 여부를 확인하고 있습니다...</div>
+          <LoadingSpinner size="medium" text="예약 가능 여부를 확인하고 있습니다..." />
         </div>
       ) : (
         <>
