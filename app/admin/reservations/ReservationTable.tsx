@@ -140,73 +140,41 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       {/* Mobile Card View */}
       <div className={styles.cardList}>
         {visibleReservations.map(res => {
-          const date = new Date(res.time);
-          const formattedDate = date.toLocaleDateString('ko-KR', {
-            month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-          });
+          const dateObj = new Date(res.time);
+          const dateStr = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+          const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
           const email = res.profiles?.email || '알 수 없는 사용자';
 
           return (
-            <div key={res.id} className={styles.nestItem}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <div className={styles.cardTime}>{formattedDate}</div>
-                  <div className={styles.cardEmail}>{email}</div>
+            <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
+              <div className={styles.resHeader}>
+                <div className={styles.resInfo}>
+                  <div className={styles.resDate}>{dateStr}</div>
+                  <div className={styles.resTime}>{timeStr}</div>
+                  <div className={styles.resEmail}>{email}</div>
                 </div>
-                <span style={{
-                  padding: '4px 10px',
-                  borderRadius: '100px',
-                  fontSize: '0.75rem',
-                  backgroundColor: res.status === 'confirmed' ? 'rgba(76, 175, 80, 0.1)' : res.status === 'cancelled' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(255, 152, 0, 0.1)',
-                  color: res.status === 'confirmed' ? '#4caf50' : res.status === 'cancelled' ? '#f44336' : '#ff9800',
-                  fontWeight: 700
-                }}>
-                  {res.status === 'confirmed' ? '확정' : res.status === 'cancelled' ? '취소' : '대기'}
-                </span>
+                <div>
+                  <span className={`${styles.resBadge} ${styles[res.status]}`}>
+                    {res.status === 'confirmed' ? '확정' : res.status === 'cancelled' ? '취소' : '대기'}
+                  </span>
+                </div>
               </div>
 
               {res.status === 'pending' && (
-                <div className={styles.cardActions}>
-                  <button
-                    onClick={() => handleStatusChange(res.id, 'confirmed')}
-                    disabled={!!loadingId}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      borderRadius: '10px',
-                      border: 'none',
-                      backgroundColor: '#4caf50',
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '승인'}
-                  </button>
+                <div className={styles.resActions}>
                   <button
                     onClick={() => handleStatusChange(res.id, 'cancelled')}
                     disabled={!!loadingId}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      borderRadius: '10px',
-                      border: 'none',
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}
+                    className={styles.btnCancel}
                   >
-                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '취소'}
+                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem', borderTopColor: 'var(--text-secondary)' }}></div> : '취소'}
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(res.id, 'confirmed')}
+                    disabled={!!loadingId}
+                    className={styles.btnApprove}
+                  >
+                    {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '승인'}
                   </button>
                 </div>
               )}
