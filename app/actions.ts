@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { Client as QStashClient } from "@upstash/qstash";
-import { startOfDay, endOfDay, subHours, isFuture } from 'date-fns';
+import { subHours, isFuture } from 'date-fns';
 import { sendPushNotification } from '@/utils/push';
 import { saveNotification } from '@/utils/notification';
 
@@ -36,17 +36,26 @@ export async function saveSubscription(subscription: PushSubscription) {
  */
 export async function getReservationsByDate(dateStr: string) {
   const supabase = await createClient();
-  // Ensure we cover the full day range to include any reservations that might overlap into this day
-  // but strictly speaking our slots are within the day.
+
+  // KST (UTC+9) 시간대 기준으로 하루의 시작과 끝 계산
+  // Vercel 서버가 UTC로 동작해도 한국 시간 기준으로 쿼리
   const targetDate = new Date(dateStr);
-  const start = startOfDay(targetDate);
-  const end = endOfDay(targetDate);
+
+  // 해당 날짜의 KST 기준 00:00:00 (= UTC 전날 15:00:00)
+  const year = targetDate.getFullYear();
+  const month = targetDate.getMonth();
+  const day = targetDate.getDate();
+
+  // KST 00:00:00 = UTC -9시간
+  const startKST = new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
+  // KST 23:59:59 = UTC 다음날 -9시간 + 23:59:59
+  const endKST = new Date(Date.UTC(year, month, day, -9 + 23, 59, 59, 999));
 
   const { data, error } = await supabase
     .from('reservations')
     .select('time, duration')
-    .gte('time', start.toISOString())
-    .lte('time', end.toISOString())
+    .gte('time', startKST.toISOString())
+    .lte('time', endKST.toISOString())
     .neq('status', 'cancelled');
 
   if (error) {
@@ -80,9 +89,12 @@ export async function createReservation(time: Date, serviceName: string = '기�
 
   if (!user) throw new Error("권한이 없습니다.");
 
-  // 영업 시간 체크 (10:00 ~ 20:30)
-  const hours = time.getHours();
-  const minutes = time.getMinutes();
+  // 영업 시간 체크 (10:00 ~ 20:30 KST)
+  // 서버가 UTC로 동작해도 KST 기준으로 계산
+  const KST_OFFSET = 9 * 60 * 60 * 1000; // 9시간 (밀리초)
+  const kstTime = new Date(time.getTime() + KST_OFFSET);
+  const hours = kstTime.getUTCHours();
+  const minutes = kstTime.getUTCMinutes();
   const startTimeMinutes = hours * 60 + minutes;
   const endTimeMinutes = startTimeMinutes + duration;
 
