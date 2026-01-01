@@ -90,7 +90,7 @@ export default function HomeClient({ initialReservedSlots = [] }: HomeClientProp
       const date = new Date(bookingTime);
       try {
         await createReservation(date, selectedService.name, selectedService.duration);
-        addToast(`${selectedService.name} 예약이 확정되었습니다.`, 'success');
+        addToast(`${selectedService.name} 예약이 접수되었습니다.`, 'success');
         await handleDateChange(date);
         setBookingTime('');
       } catch (e: unknown) {
