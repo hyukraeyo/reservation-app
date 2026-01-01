@@ -6,6 +6,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 import styles from '@/app/home.module.scss'
+import ShowMoreButton from '@/app/components/ShowMoreButton'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -91,14 +92,10 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       </div>
 
       {hasMore && (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button
-            className={styles.showMoreButton}
-            onClick={() => setDisplayCount(prev => prev + 5)}
-          >
-            더 보기 ({reservations.length - displayCount}개 남음)
-          </button>
-        </div>
+        <ShowMoreButton
+          onClick={() => setDisplayCount(prev => prev + 5)}
+          remainingCount={reservations.length - displayCount}
+        />
       )}
 
 

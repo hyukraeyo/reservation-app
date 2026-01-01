@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './my.module.scss';
 import CancelButton from './CancelButton';
 import { ToastContainer, useToast } from '@/app/components/Toast';
+import ShowMoreButton from '@/app/components/ShowMoreButton';
 
 interface Reservation {
     id: string;
@@ -17,6 +19,11 @@ interface MyReservationsListProps {
 export default function MyReservationsList({ initialReservations }: MyReservationsListProps) {
     const { toasts, addToast } = useToast();
     const now = new Date();
+    const [displayCount, setDisplayCount] = useState(5);
+
+    const visibleReservations = initialReservations.slice(0, displayCount);
+    const hasMore = initialReservations.length > displayCount;
+    const remainingCount = initialReservations.length - displayCount;
 
     return (
         <>
@@ -30,7 +37,7 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                     </div>
                 ) : (
                     <div className={styles.listContainer}>
-                        {initialReservations.map((reservation) => {
+                        {visibleReservations.map((reservation) => {
                             const reservationDate = new Date(reservation.time);
                             const isPast = reservationDate < now;
                             const canCancel = reservation.status !== 'cancelled' && reservation.status !== 'confirmed' && !isPast;
@@ -76,9 +83,17 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                                 </div>
                             );
                         })}
+
+                        {hasMore && (
+                            <ShowMoreButton
+                                onClick={() => setDisplayCount(prev => prev + 5)}
+                                remainingCount={remainingCount}
+                            />
+                        )}
                     </div>
                 )}
             </div>
         </>
     );
 }
+

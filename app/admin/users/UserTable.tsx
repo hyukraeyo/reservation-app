@@ -4,6 +4,7 @@ import { updateUserRole } from '../actions'
 import { useState, useRef } from 'react'
 import { Profile } from '@/app/types'
 import styles from '@/app/home.module.scss'
+import ShowMoreButton from '@/app/components/ShowMoreButton'
 
 export default function UserTable({ users }: { users: Profile[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -103,14 +104,11 @@ export default function UserTable({ users }: { users: Profile[] }) {
       </div>
 
       {hasMore && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-          <button
-            className={styles.showMoreButton}
-            onClick={() => setDisplayCount(prev => prev + 5)}
-          >
-            사용자 더 보기 ({users.length - displayCount}명 남음)
-          </button>
-        </div>
+        <ShowMoreButton
+          onClick={() => setDisplayCount(prev => prev + 5)}
+          remainingCount={users.length - displayCount}
+          label="사용자 더보기"
+        />
       )}
 
 

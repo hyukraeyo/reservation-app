@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import styles from './notifications.module.scss';
+import NotificationsList from './NotificationsList';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,19 +58,10 @@ export default async function NotificationsPage() {
                     {'\n\n'}
                     (개발자 노트: schema_notifications.sql 파일을 참조하여 테이블을 생성해주세요)
                 </div>
-            ) : notifications.length === 0 ? (
-                <div className={styles.empty}>새로운 알림이 없습니다.</div>
             ) : (
-                <div className={styles.list}>
-                    {notifications.map((n) => (
-                        <div key={n.id} className={`${styles.item} ${n.is_read ? styles.read : styles.unread}`}>
-                            <div className={styles.title}>{n.title}</div>
-                            <div className={styles.message}>{n.message}</div>
-                            <div className={styles.time}>{new Date(n.created_at).toLocaleString('ko-KR')}</div>
-                        </div>
-                    ))}
-                </div>
+                <NotificationsList notifications={notifications} />
             )}
         </div>
     );
 }
+
