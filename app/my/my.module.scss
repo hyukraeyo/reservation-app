@@ -1,22 +1,14 @@
 .listContainer {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .historyCard {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 2rem 0; /* 좌우 패딩 제거 (상위 page-container가 담당) */
-}
-
-.header {
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin-bottom: 2rem;
-  color: var(--text-main);
-  letter-spacing: -0.02em;
+  padding: 120px 0 4rem; /* 알림함과 동일한 상단 여백 */
 }
 
 .reservationCard {
@@ -28,12 +20,11 @@
   align-items: center;
   gap: 2rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent; 
-  box-shadow: var(--shadow-sm); 
+  border: 1px solid var(--border-color);
+  box-shadow: none;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
   }
 }
 
@@ -76,7 +67,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding-left: 2rem;
-  border-left: 2px solid var(--border-color); // 구분선 추가
+  border-left: 2px solid var(--border-color);
 }
 
 .timeWrapper {
@@ -110,7 +101,7 @@
   align-items: center;
   gap: 6px;
   padding: 0;
-  background: transparent !important; // 박스 스타일 제거
+  background: transparent !important;
 
   &::before {
     content: '';
@@ -136,13 +127,12 @@
 .cancelled {
   opacity: 0.6;
   filter: grayscale(1);
-  box-shadow: none !important;
   background: transparent;
   border: 1px dashed var(--border-color);
+  box-shadow: none !important;
 
   &:hover {
-    transform: none;
-    box-shadow: none;
+    border-color: var(--border-color);
   }
   
   .dateSection .day { color: var(--text-secondary); }
@@ -244,7 +234,7 @@
       padding: 12px;
       display: flex;
       justify-content: center;
-      background: var(--bg-hover); // 모바일에서는 버튼감 주기
+      background: var(--bg-hover);
       border: none;
       
       &:hover {

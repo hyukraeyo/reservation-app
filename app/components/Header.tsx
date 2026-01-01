@@ -72,11 +72,9 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
                 ) : (
                     <>
                         {/* 일반 페이지 */}
-                        {pathname !== '/my' && (
-                            <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
-                                <IconCalendar />
-                            </Link>
-                        )}
+                        <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
+                            <IconCalendar />
+                        </Link>
                         {isAdmin && (
                             <Link href="/admin" className={styles.iconLinkFilled} title="관리자 페이지" aria-label="관리자 페이지">
                                 <IconAdmin />

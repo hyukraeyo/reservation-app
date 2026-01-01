@@ -20,7 +20,7 @@ export default function AdminLayout({
   return (
     <AdminAuthGuard>
       <div className="admin-layout" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)', color: 'var(--text-main)' }}>
-        <main style={{ padding: '6rem 1rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <main style={{ padding: '120px 0 4rem', maxWidth: '600px', margin: '0 auto' }}>
           {children}
         </main>
       </div>

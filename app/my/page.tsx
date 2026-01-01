@@ -15,8 +15,6 @@ export default async function MyPage() {
     const reservations = await getMyReservations();
 
     return (
-        <main className={styles.container}>
-            <MyReservationsList initialReservations={reservations} />
-        </main>
+        <MyReservationsList initialReservations={reservations} />
     );
 }

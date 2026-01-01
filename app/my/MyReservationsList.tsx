@@ -22,7 +22,6 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
         <>
             <ToastContainer toasts={toasts} />
             <div className={styles.historyCard}>
-                <h2 className={styles.header}>내 예약 내역</h2>
                 {initialReservations.length === 0 ? (
                     <div className={styles.emptyState}>
                         <div className={styles.emptyIcon}>📅</div>

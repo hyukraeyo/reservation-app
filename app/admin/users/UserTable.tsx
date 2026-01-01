@@ -39,63 +39,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
 
   return (
     <div className={styles.tableWrapper}>
-      {/* Desktop Table View */}
-      <div className="desktop-only" style={{ overflowX: 'auto', display: 'none' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-          <thead>
-            <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border-color)' }}>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>프로필</th>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>이름</th>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>이메일</th>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>연락처</th>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>역할</th>
-              <th style={{ padding: '1rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleUsers.map(user => (
-              <tr key={user.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }}>
-                <td style={{ padding: '0.75rem' }}>
-                  {user.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.avatar_url}
-                      alt="profile"
-                      className={styles.userAvatar}
-                      style={{ width: '36px', height: '36px' }}
-                    />
-                  ) : (
-                    <div className={styles.userAvatarPlaceholder} style={{ width: '36px', height: '36px', fontSize: '1rem' }}>
-                      👤
-                    </div>
-                  )}
-                </td>
-                <td style={{ padding: '0.75rem', color: 'var(--text-main)', fontWeight: 600 }}>
-                  {user.name || '-'}
-                </td>
-                <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{user.email}</td>
-                <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{user.phone || '-'}</td>
-                <td style={{ padding: '0.75rem' }}>
-                  <select
-                    defaultValue={user.role || 'user'}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    disabled={!!loadingId}
-                    className={styles.roleSelect}
-                    style={{ padding: '0.4rem 2rem 0.4rem 0.75rem', fontSize: '0.85rem' }}
-                  >
-                    <option value="user">일반 사용자</option>
-                    <option value="owner">사장님 (Owner)</option>
-                    <option value="admin">관리자 (Admin)</option>
-                  </select>
-                </td>
-                <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem', fontFamily: 'monospace' }}>
-                  {user.id.slice(0, 8)}...
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
 
       {/* Mobile Card View */}
       <div className={styles.cardList}>
@@ -169,12 +113,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
         </div>
       )}
 
-      <style jsx>{`
-        @media (min-width: 768px) {
-          .desktop-only { display: block !important; }
-          .${styles.cardList} { display: none !important; }
-        }
-      `}</style>
+
     </div>
   )
 }

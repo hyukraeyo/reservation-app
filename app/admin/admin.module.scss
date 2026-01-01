@@ -2,15 +2,9 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 1.5rem;
   animation: fadeIn 0.5s ease;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    gap: 1.5rem;
-  }
 }
 
 .header {
@@ -90,14 +84,9 @@
 }
 
 .mainGrid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 2rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .menuGrid {

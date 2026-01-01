@@ -6,8 +6,6 @@ export default async function AdminUsersPage() {
   const users = await getUsers()
 
   return (
-    <Card title="회원 권한 관리">
-      <UserTable users={users} />
-    </Card>
+    <UserTable users={users} />
   )
 }

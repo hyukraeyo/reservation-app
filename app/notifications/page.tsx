@@ -1,5 +1,4 @@
 import { createClient } from '@/utils/supabase/server';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import styles from './notifications.module.scss';
 
@@ -52,11 +51,6 @@ export default async function NotificationsPage() {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <h1>알림함</h1>
-                <Link href="/" className={styles.backLink}>메인으로</Link>
-            </header>
-
             {errorMsg ? (
                 <div className={styles.empty} style={{ whiteSpace: 'pre-wrap' }}>
                     {errorMsg}
