@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { reservation_id } = await req.json();
 
     const supabase = await createClient();
-    
+
     // 1. Get Reservation & User Subscription info
     const { data: reservation, error: resError } = await supabase
       .from('reservations')
@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Reservation not found' }, { status: 404 });
     }
 
-    // Skip if cancelled
-    if (reservation.status === 'cancelled') {
-        return NextResponse.json({ message: 'Reservation cancelled, skipping notification' });
+    // Skip if not confirmed (only remind for confirmed reservations)
+    if (reservation.status !== 'confirmed') {
+      return NextResponse.json({ message: 'Reservation not confirmed, skipping notification' });
     }
 
     const subscription = reservation.profiles?.push_subscription;

@@ -7,13 +7,13 @@ import AuthenticatedHeader from '@/app/components/AuthenticatedHeader'
 import HeaderSkeleton from '@/app/components/HeaderSkeleton'
 
 export const metadata: Metadata = {
-  title: "예약 앱",
+  title: "m9",
   description: "노쇼 방지 예약 시스템",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "혁래요",
+    title: "m9",
   },
   formatDetection: {
     telephone: false,

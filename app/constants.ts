@@ -7,4 +7,4 @@ export const SERVICE_LIST = [
     { id: 'gel_pedi', name: '젤패디', duration: 60, price: '60,000원' },
 ];
 
-export const APP_NAME = "혁래요";
+export const APP_NAME = "m9";
