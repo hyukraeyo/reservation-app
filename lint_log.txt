@@ -1,0 +1,45 @@
+
+> reservation-app@0.1.0 lint
+> eslint
+
+
+C:\Users\johr9\Documents\git\reservation-app\app\HomeClient.tsx
+  26:21  warning  'setIsLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  31:9   warning  'userEmail' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  32:9   warning  'userName' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  33:9   warning  'isAdmin' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  38:9   warning  'router' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\johr9\Documents\git\reservation-app\app\components\Calendar.tsx
+  77:6  warning  React Hook useEffect has a missing dependency: 'selectedDate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\johr9\Documents\git\reservation-app\app\components\Header.tsx
+  8:10  warning  'ThemeToggle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\johr9\Documents\git\reservation-app\app\components\NavigationProgress.tsx
+   3:31  warning  'useTransition' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  19:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\johr9\Documents\git\reservation-app\app\components\NavigationProgress.tsx:19:9
+  17 |     useEffect(() => {
+  18 |         // 페이지가 변경되면 진행 바를 완료 상태로
+> 19 |         setIsNavigating(false);
+     |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |         setProgress(100);
+  21 |
+  22 |         const timer = setTimeout(() => setProgress(0), 200);  react-hooks/set-state-in-effect
+  45:15  warning  'handleComplete' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+
+C:\Users\johr9\Documents\git\reservation-app\app\my\MyReservationsList.tsx
+  3:10  warning  'useState' is defined but never used    @typescript-eslint/no-unused-vars
+  4:8   warning  'Card' is defined but never used        @typescript-eslint/no-unused-vars
+  5:8   warning  'homeStyles' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 13 problems (1 error, 12 warnings)
+

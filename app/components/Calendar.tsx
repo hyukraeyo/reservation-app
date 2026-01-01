@@ -74,7 +74,8 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     } else {
       setSelectedTime(null);
     }
-  }, [initialValue, onDateChange]); // removed selectedDate from dependency to avoid complications, but logic uses functional updates or check inside
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue, onDateChange]);
 
 
   // Scroll to time section when date is selected

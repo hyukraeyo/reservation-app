@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import styles from './Header.module.scss';
-import { ThemeToggle } from './ThemeToggle';
+// import { ThemeToggle } from './ThemeToggle'; // 사용 안함
 
 import { IconHome, IconCalendar, IconCalendarCheck, IconUsers, IconAdmin, IconLogOut } from './icons';
 

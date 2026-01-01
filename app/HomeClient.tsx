@@ -3,39 +3,29 @@
 import { useState, useEffect, useTransition, useCallback } from 'react';
 import { saveSubscription, createReservation, getReservationsByDate } from './actions';
 import styles from './home.module.scss';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import Calendar from '@/app/components/Calendar';
 import { useToast, ToastContainer } from '@/app/components/Toast';
 import { urlBase64ToUint8Array } from '@/utils/helpers';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { SERVICE_LIST } from '@/app/constants';
 
 
 
 
 interface HomeClientProps {
-  initialUserEmail: string | null;
-  initialUserName: string | null;
-  initialIsAdmin: boolean;
   initialReservedSlots: string[];
 }
 
-export default function HomeClient({ initialUserEmail, initialUserName, initialIsAdmin, initialReservedSlots = [] }: HomeClientProps) {
+export default function HomeClient({ initialReservedSlots = [] }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
-  // 초기 로딩을 false로 설정 - 컨텐츠 즉시 표시
-  const [isLoading, setIsLoading] = useState(false);
+  // 초기 로딩은 Calendar 내부나 서버 로직에서 처리됨
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
   const [selectedService, setSelectedService] = useState(SERVICE_LIST[0]);
 
-  const userEmail = initialUserEmail;
-  const userName = initialUserName;
-  const isAdmin = initialIsAdmin;
-
   const [isSubscribing, startSubscribing] = useTransition();
   const [isBooking, startBooking] = useTransition();
 
-  const router = useRouter();
   const { toasts, addToast } = useToast();
 
   const handleDateChange = useCallback(async (date: Date) => {
@@ -115,77 +105,71 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
 
 
 
-      {isLoading ? (
-        <div className={styles.contentLoader}>
-          <LoadingSpinner size="medium" text="예약 가능 여부를 확인하고 있습니다..." />
-        </div>
+      {/* isLoading check removed */}
+      {(!isSubscribed && process.env.NODE_ENV === 'production') ? (
+        <button
+          onClick={subscribe}
+          className={styles.button}
+          disabled={isSubscribing}
+          style={{ opacity: isSubscribing ? 0.7 : 1 }}
+        >
+          {isSubscribing ? '구독 중...' : '알림 받기'}
+        </button>
       ) : (
-        <>
-          {(!isSubscribed && process.env.NODE_ENV === 'production') ? (
-            <button
-              onClick={subscribe}
-              className={styles.button}
-              disabled={isSubscribing}
-              style={{ opacity: isSubscribing ? 0.7 : 1 }}
-            >
-              {isSubscribing ? '구독 중...' : '알림 받기'}
-            </button>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '40px' }}>
-              {/* Service Selection UI */}
-              <div className={styles.serviceGrid}>
-                {SERVICE_LIST.map((service) => (
-                  <button
-                    key={service.id}
-                    onClick={() => {
-                      setSelectedService(service);
-                      setBookingTime(''); // Reset time when service changes
-                    }}
-                    className={`${styles.serviceButton} ${selectedService.id === service.id ? styles.selected : ''}`}
-                  >
-                    <span className={styles.serviceName}>{service.name}</span>
-                    <span className={styles.serviceDuration}>{service.duration}분</span>
-                  </button>
-                ))}
-              </div>
-
-              {!isSubscribed && process.env.NODE_ENV === 'development' && (
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '-0.5rem' }}>
-                  (개발 모드: 알림 구독 없이 예약 기능을 테스트할 수 있습니다)
-                </p>
-              )}
-              <Calendar
-                onSelect={setBookingTime}
-                initialValue={bookingTime}
-                reservedSlots={reservedSlots}
-                onDateChange={handleDateChange}
-                duration={selectedService.duration}
-              />
-              <div
-                className={styles.floatingActionContainer}
-                style={{
-                  transform: bookingTime ? 'translateY(0)' : 'translateY(2rem)',
-                  opacity: bookingTime ? 1 : 0,
-                  visibility: bookingTime ? 'visible' : 'hidden',
-                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '40px' }}>
+          {/* Service Selection UI */}
+          <div className={styles.serviceGrid}>
+            {SERVICE_LIST.map((service) => (
+              <button
+                key={service.id}
+                onClick={() => {
+                  setSelectedService(service);
+                  setBookingTime(''); // Reset time when service changes
                 }}
+                className={`${styles.serviceButton} ${selectedService.id === service.id ? styles.selected : ''}`}
               >
-                <button
-                  onClick={book}
-                  disabled={!bookingTime || isBooking}
-                  className={styles.floatingButton}
-                  style={{
-                    opacity: isBooking ? 0.8 : 1,
-                    cursor: isBooking ? 'wait' : 'pointer',
-                  }}
-                >
-                  {isBooking ? '잠시만 기다려주세요...' : `${selectedService.name} 예약하기`}
-                </button>
-              </div>
-            </div>
+                <span className={styles.serviceName}>{service.name}</span>
+                <span className={styles.serviceDuration}>{service.duration}분</span>
+              </button>
+            ))}
+          </div>
+
+          {!isSubscribed && process.env.NODE_ENV === 'development' && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '-0.5rem' }}>
+              (개발 모드: 알림 구독 없이 예약 기능을 테스트할 수 있습니다)
+            </p>
           )}
-        </>
+          <Calendar
+            onSelect={setBookingTime}
+            initialValue={bookingTime}
+            reservedSlots={reservedSlots}
+            onDateChange={handleDateChange}
+            duration={selectedService.duration}
+          />
+          <div
+            className={styles.floatingActionContainer}
+            style={{
+              transform: bookingTime ? 'translateY(0)' : 'translateY(2rem)',
+              opacity: bookingTime ? 1 : 0,
+              visibility: bookingTime ? 'visible' : 'hidden',
+              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
+          >
+            <button
+              onClick={book}
+              disabled={!bookingTime || isBooking}
+              className={styles.floatingButton}
+              style={{
+                opacity: isBooking ? 0.8 : 1,
+                cursor: isBooking ? 'wait' : 'pointer',
+              }}
+            >
+              {isBooking ? '잠시만 기다려주세요...' : `${selectedService.name} 예약하기`}
+            </button>
+          </div>
+        </div>
       )}
+      {/* isLoading check end */}
 
       {/* <ThemeToggle className={styles.floatingThemeToggle} /> */}
     </main>

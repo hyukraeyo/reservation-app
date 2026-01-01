@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import Card from '@/app/components/Card';
-import homeStyles from '@/app/home.module.scss';
 import styles from './my.module.scss';
 import CancelButton from './CancelButton';
 import { ToastContainer, useToast } from '@/app/components/Toast';
