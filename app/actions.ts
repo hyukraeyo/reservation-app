@@ -127,7 +127,6 @@ export async function createReservation(time: Date, serviceName: string = 'ê¸°ë³
   try {
     const { data: admins } = await supabase
       .from('profiles')
-      .from('profiles')
       .select('id, push_subscription')
       .in('role', ['owner', 'admin'])
       .not('push_subscription', 'is', null);
@@ -264,7 +263,6 @@ export async function cancelMyReservation(reservationId: string) {
   // 1. Notify Admins about the cancellation
   try {
     const { data: admins } = await supabase
-      .from('profiles')
       .from('profiles')
       .select('id, push_subscription')
       .in('role', ['owner', 'admin'])

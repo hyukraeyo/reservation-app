@@ -48,7 +48,9 @@ export default function RootLayout({
           <Suspense fallback={<HeaderSkeleton />}>
             <AuthenticatedHeader />
           </Suspense>
-          {children}
+          <main className="page-container">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

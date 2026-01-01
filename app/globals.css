@@ -231,3 +231,19 @@ button:active,
     overscroll-behavior-y: contain;
   }
 }
+
+.page-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding-left: 14px; /* 모바일에서 더 좁은 여백 */
+    padding-right: 14px;
+  }
+}
