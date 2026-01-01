@@ -29,7 +29,8 @@ interface HomeClientProps {
 
 export default function HomeClient({ initialUserEmail, initialUserName, initialIsAdmin, initialReservedSlots = [] }: HomeClientProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // 초기 로딩을 false로 설정 - 컨텐츠 즉시 표시
+  const [isLoading, setIsLoading] = useState(false);
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
   const [selectedService, setSelectedService] = useState(SERVICES[0]);
@@ -73,25 +74,15 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
     }
   }, []);
 
+  // Service Worker 초기화 (백그라운드에서 비동기 처리)
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window && process.env.NODE_ENV === 'production') {
       navigator.serviceWorker
         .register('/sw.js')
         .then(() => navigator.serviceWorker.ready)
-        .then((registration) => {
-          return registration.pushManager.getSubscription();
-        })
-        .then((subscription) => {
-          setIsSubscribed(!!subscription);
-        })
-        .catch((error) => {
-          console.error('Service Worker registration failed:', error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setTimeout(() => setIsLoading(false), 0);
+        .then((registration) => registration.pushManager.getSubscription())
+        .then((subscription) => setIsSubscribed(!!subscription))
+        .catch((error) => console.error('Service Worker registration failed:', error));
     }
   }, []);
 

@@ -130,3 +130,104 @@ a {
   font-weight: 500;
   letter-spacing: -0.01em;
 }
+
+/* ============================================
+   View Transitions API - 페이지 전환 애니메이션
+   ============================================ */
+
+/* 기본 View Transition 애니메이션 */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slide-in-from-right {
+  from { 
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-to-left {
+  from { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to { 
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* View Transitions 설정 */
+::view-transition-old(root) {
+  animation: fade-out 0.15s ease-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: fade-in 0.2s ease-in forwards;
+}
+
+/* 페이지 컨텐츠 전환 (더 부드러운 효과) */
+::view-transition-old(page-content) {
+  animation: slide-out-to-left 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+::view-transition-new(page-content) {
+  animation: slide-in-from-right 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 메인 컨텐츠에 view-transition-name 적용 */
+main {
+  view-transition-name: page-content;
+}
+
+/* ============================================
+   터치 피드백 - 즉각적인 반응성
+   ============================================ */
+
+/* 링크/버튼 터치 시 즉각 피드백 */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 클릭 가능한 요소에 터치 피드백 */
+a:active,
+button:active,
+[role="button"]:active {
+  transform: scale(0.98);
+  transition: transform 0.05s ease-out;
+}
+
+/* iOS Safari 최적화 */
+@supports (-webkit-touch-callout: none) {
+  body {
+    /* iOS에서 스크롤 부드럽게 */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* iOS에서 fixed 요소 최적화 */
+  .admin-layout,
+  main {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* PWA 모드에서의 추가 최적화 */
+@media (display-mode: standalone) {
+  body {
+    /* PWA에서 overscroll 방지 */
+    overscroll-behavior-y: contain;
+  }
+}

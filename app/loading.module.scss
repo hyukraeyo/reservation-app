@@ -26,3 +26,21 @@
   border-radius: 16px;
   padding: 1.5rem;
 }
+
+// 반응형 스켈레톤 - 데스크톱 전용
+.desktopSkeleton {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+// 반응형 스켈레톤 - 모바일 전용
+.mobileSkeleton {
+  display: block;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
