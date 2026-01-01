@@ -48,7 +48,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border-color)' }}>
               <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)' }}>시간</th>
-              <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)' }}>고객 이메일</th>
+              <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)' }}>고객명</th>
               <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)' }}>상태</th>
               <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)' }}>예약 ID</th>
               <th style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--text-main)', textAlign: 'center' }}>관리</th>
@@ -61,12 +61,12 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                 year: 'numeric', month: 'long', day: 'numeric',
                 hour: '2-digit', minute: '2-digit'
               });
-              const email = res.profiles?.email || '알 수 없는 사용자';
+              const displayName = res.profiles?.full_name || res.profiles?.email || '알 수 없는 사용자';
 
               return (
                 <tr key={res.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }}>
                   <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{formattedDate}</td>
-                  <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{email}</td>
+                  <td style={{ padding: '0.75rem', color: 'var(--text-main)' }}>{displayName}</td>
                   <td style={{ padding: '0.75rem' }}>
                     <span style={{
                       padding: '4px 8px',
@@ -143,7 +143,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
           const dateObj = new Date(res.time);
           const dateStr = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
           const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
-          const email = res.profiles?.email || '알 수 없는 사용자';
+          const displayName = res.profiles?.full_name || res.profiles?.email || '알 수 없는 사용자';
 
           return (
             <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
@@ -151,7 +151,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                 <div className={styles.resInfo}>
                   <div className={styles.resDate}>{dateStr}</div>
                   <div className={styles.resTime}>{timeStr}</div>
-                  <div className={styles.resEmail}>{email}</div>
+                  <div className={styles.resEmail}>{displayName}</div>
                 </div>
                 <div>
                   <span className={`${styles.resBadge} ${styles[res.status]}`}>

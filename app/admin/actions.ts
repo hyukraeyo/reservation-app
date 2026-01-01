@@ -90,7 +90,8 @@ export async function getReservations(): Promise<Reservation[]> {
     .select(`
       *,
       profiles (
-        email
+        email,
+        full_name
       )
     `)
     .order('created_at', { ascending: false })
