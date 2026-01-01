@@ -28,9 +28,10 @@ interface CalendarProps {
   reservedSlots?: string[];
   onDateChange?: (date: Date) => void;
   duration?: number; // duration in minutes, default 30
+  isLoading?: boolean;
 }
 
-export default function Calendar({ onSelect, initialValue, reservedSlots = [], onDateChange, duration = 30 }: CalendarProps) {
+export default function Calendar({ onSelect, initialValue, reservedSlots = [], onDateChange, duration = 30, isLoading = false }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -268,17 +269,25 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
             ref={timeGridRef}
             onScroll={checkScroll}
           >
-            {timeSlots.map(({ time, disabled }) => (
-              <button
-                key={time}
-                disabled={disabled}
-                className={`${styles.timeButton} ${selectedTime === time ? styles.selected : ''}`}
-                onClick={() => !disabled && handleTimeClick(time)}
-                style={disabled ? { opacity: 0.3, textDecoration: 'line-through', cursor: 'not-allowed' } : {}}
-              >
-                {time}
-              </button>
-            ))}
+            {isLoading ? (
+              Array.from({ length: 12 }).map((_, i) => (
+                <div key={`skeleton-${i}`} className={`${styles.timeButton} ${styles.skeleton}`}>
+                  00:00
+                </div>
+              ))
+            ) : (
+              timeSlots.map(({ time, disabled }) => (
+                <button
+                  key={time}
+                  disabled={disabled}
+                  className={`${styles.timeButton} ${selectedTime === time ? styles.selected : ''}`}
+                  onClick={() => !disabled && handleTimeClick(time)}
+                  style={disabled ? { opacity: 0.3, textDecoration: 'line-through', cursor: 'not-allowed' } : {}}
+                >
+                  {time}
+                </button>
+              ))
+            )}
           </div>
         </div>
       )}

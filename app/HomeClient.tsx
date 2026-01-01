@@ -22,6 +22,7 @@ export default function HomeClient({ initialReservedSlots = [] }: HomeClientProp
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
   const [selectedService, setSelectedService] = useState(SERVICE_LIST[0]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isSubscribing, startSubscribing] = useTransition();
   const [isBooking, startBooking] = useTransition();
@@ -29,11 +30,14 @@ export default function HomeClient({ initialReservedSlots = [] }: HomeClientProp
   const { toasts, addToast } = useToast();
 
   const handleDateChange = useCallback(async (date: Date) => {
+    setIsLoading(true);
     try {
       const slots = await getReservationsByDate(date.toISOString());
       setReservedSlots(slots || []);
     } catch (error) {
       console.error("Failed to fetch reserved slots", error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -145,6 +149,7 @@ export default function HomeClient({ initialReservedSlots = [] }: HomeClientProp
             reservedSlots={reservedSlots}
             onDateChange={handleDateChange}
             duration={selectedService.duration}
+            isLoading={isLoading}
           />
           <div
             className={styles.floatingActionContainer}

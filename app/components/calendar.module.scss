@@ -252,3 +252,20 @@
     transform: translateY(0);
   }
 }
+
+.skeleton {
+  /* timeButton 클래스와 함께 사용하여 크기 일치 */
+  background-color: var(--bg-hover) !important;
+  border-color: transparent !important;
+  color: transparent !important; /* 내부 텍스트 숨기기 */
+  box-shadow: none !important;
+  animation: pulse 1.5s infinite ease-in-out;
+  pointer-events: none;
+  cursor: default !important;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; background-color: var(--bg-hover); }
+  50% { opacity: 0.3; background-color: var(--border-color); }
+  100% { opacity: 0.6; background-color: var(--bg-hover); }
+}
