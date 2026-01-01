@@ -26,14 +26,13 @@ export default async function NotificationsPage() {
         if (error) throw error;
         notifications = data || [];
     } catch (err: any) {
-        // 테이블이 없는 경우 (42P01: undefined_table)
-        if (err.code === '42P01') {
-            errorMsg = "알림 기능을 사용하려면 데이터베이스 설정이 필요합니다. (notifications 테이블 없음)";
+        // 테이블이 없는 경우 (42P01: undefined_table) 또는 에러 메시지에 'does not exist'가 포함된 경우
+        const errorMessage = err.message || JSON.stringify(err);
+        if (err.code === '42P01' || errorMessage.includes('does not exist') || errorMessage.includes('notifications')) {
+            errorMsg = "알림 기능을 사용하려면 데이터베이스 설정이 필요합니다.\n(notifications 테이블이 없습니다)";
         } else {
             console.error('Notification Fetch Error:', err);
-            // 에러가 나더라도 UI를 깨뜨리지 않고 안내 메시지 표시
-            // errorMsg = "알림을 불러오는 중 오류가 발생했습니다."; 
-            // 일단 무시하고 빈 목록으로 처리할 수도 있지만, 사용자에게 테이블 생성을 안내하기 위해 표시
+            errorMsg = `알림을 불러오는 중 오류가 발생했습니다.\n${errorMessage}`;
         }
     }
 
