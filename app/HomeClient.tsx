@@ -138,7 +138,7 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '40px' }}>
               {/* Service Selection UI */}
-              <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className={styles.serviceGrid}>
                 {SERVICES.map((service) => (
                   <button
                     key={service.id}
@@ -146,28 +146,10 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                       setSelectedService(service);
                       setBookingTime(''); // Reset time when service changes
                     }}
-                    style={{
-                      padding: '16px',
-                      borderRadius: '16px',
-                      border: selectedService.id === service.id ? '1px solid var(--primary-color)' : '1px solid transparent',
-                      background: 'var(--bg-card)',
-                      color: selectedService.id === service.id ? 'var(--primary-color)' : 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '6px',
-                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      boxShadow: selectedService.id === service.id
-                        ? '0 0 0 1px var(--primary-color), 0 4px 12px rgba(0,0,0,0.05)'
-                        : 'var(--shadow-sm)',
-                      transform: selectedService.id === service.id ? 'translateY(-2px)' : 'none',
-                    }}
+                    className={`${styles.serviceButton} ${selectedService.id === service.id ? styles.selected : ''}`}
                   >
-                    <span style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em', color: selectedService.id === service.id ? 'currentColor' : 'var(--text-main)' }}>{service.name}</span>
-                    <span style={{ fontSize: '0.85rem', opacity: 0.8, fontWeight: 500 }}>{service.duration}분</span>
+                    <span className={styles.serviceName}>{service.name}</span>
+                    <span className={styles.serviceDuration}>{service.duration}분</span>
                   </button>
                 ))}
               </div>
@@ -202,12 +184,7 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
                     cursor: isBooking ? 'wait' : 'pointer',
                   }}
                 >
-                  {isBooking ? (
-                    <>
-                      <div className="spinner"></div>
-                      <span>처리 중...</span>
-                    </>
-                  ) : `${selectedService.name} 예약하기`}
+                  {isBooking ? '잠시만 기다려주세요...' : `${selectedService.name} 예약하기`}
                 </button>
               </div>
             </div>

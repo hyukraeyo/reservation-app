@@ -533,3 +533,55 @@
     right: 1.5rem;
   }
 }
+
+.serviceGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.serviceButton {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  
+  &:hover {
+    background: var(--bg-hover);
+  }
+
+  &.selected {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color), 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+    
+    .serviceName {
+      color: currentColor;
+    }
+  }
+}
+
+.serviceName {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+.serviceDuration {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  font-weight: 500;
+}

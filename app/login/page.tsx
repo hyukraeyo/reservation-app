@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ThemeToggle } from '@/app/components/ThemeToggle'
+import LoadingSpinner from '@/app/components/LoadingSpinner'
 
 
 function LoginForm() {
@@ -113,6 +114,11 @@ function LoginForm() {
         <ThemeToggle />
       </div>
       <div className={styles.loginCard}>
+        {loading && (
+          <div className={styles.loadingOverlay}>
+            <LoadingSpinner size="medium" text="처리 중..." />
+          </div>
+        )}
         <div className={styles.header}>
           <h1>{mode === 'login' ? '환영합니다' : '회원가입'}</h1>
           <p>{mode === 'login' ? '예약 관리를 위해 로그인해주세요' : '무료로 예약을 시작해보세요'}</p>
@@ -223,12 +229,7 @@ function LoginForm() {
                 gap: '0.5rem'
               }}
             >
-              {loading ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>처리 중...</span>
-                </>
-              ) : (mode === 'login' ? '로그인' : '가입하기')}
+              {loading ? '잠시만 기다려주세요...' : (mode === 'login' ? '로그인' : '가입하기')}
             </button>
 
             <div className={styles.divider}>
