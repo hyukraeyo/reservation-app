@@ -8,15 +8,10 @@ import Calendar from '@/app/components/Calendar';
 import { useToast, ToastContainer } from '@/app/components/Toast';
 import { urlBase64ToUint8Array } from '@/utils/helpers';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { SERVICE_LIST } from '@/app/constants';
 
-const SERVICES = [
-  { id: 'moisture_perm', name: '수분펌', duration: 60, price: '40,000원' },
-  { id: 'air_flat', name: '에어플랫모', duration: 60, price: '60,000원' },
-  { id: 'perm_point', name: '펌포인트래쉬', duration: 30, price: '30,000원' },
-  { id: 'perm_ext', name: '펌연장', duration: 90, price: '80,000원' },
-  { id: 'gel_nail', name: '젤네일', duration: 60, price: '50,000원' },
-  { id: 'gel_pedi', name: '젤패디', duration: 60, price: '60,000원' },
-];
+
+
 
 interface HomeClientProps {
   initialUserEmail: string | null;
@@ -31,7 +26,7 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
   const [isLoading, setIsLoading] = useState(false);
   const [bookingTime, setBookingTime] = useState('');
   const [reservedSlots, setReservedSlots] = useState<string[]>(initialReservedSlots);
-  const [selectedService, setSelectedService] = useState(SERVICES[0]);
+  const [selectedService, setSelectedService] = useState(SERVICE_LIST[0]);
 
   const userEmail = initialUserEmail;
   const userName = initialUserName;
@@ -139,7 +134,7 @@ export default function HomeClient({ initialUserEmail, initialUserName, initialI
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%', maxWidth: '400px', paddingBottom: '40px' }}>
               {/* Service Selection UI */}
               <div className={styles.serviceGrid}>
-                {SERVICES.map((service) => (
+                {SERVICE_LIST.map((service) => (
                   <button
                     key={service.id}
                     onClick={() => {

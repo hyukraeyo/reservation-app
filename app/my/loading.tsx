@@ -1,18 +1,10 @@
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import LoadingPage from '@/app/components/LoadingPage';
 import styles from '@/app/home.module.scss';
 
 export default function MyPageLoading() {
     return (
         <main className={styles.container}>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '60vh',
-                width: '100%'
-            }}>
-                <LoadingSpinner size="large" />
-            </div>
+            <LoadingPage style={{ backgroundColor: 'transparent' }} />
         </main>
     );
 }
