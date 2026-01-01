@@ -30,6 +30,7 @@
   white-space: normal;
   text-align: center;
   line-height: 1.4;
+  word-break: keep-all;
   max-width: calc(100vw - 2rem);
 
   :global(.dark) & {
