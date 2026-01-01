@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
+import { usePathname } from 'next/navigation';
 import styles from './Header.module.scss';
-// import { ThemeToggle } from './ThemeToggle'; // 사용 안함
-
-import { IconHome, IconCalendar, IconCalendarCheck, IconUsers, IconAdmin, IconLogOut } from './icons';
+import { APP_NAME } from '@/app/constants';
+import { IconCalendar, IconCalendarCheck, IconUsers, IconAdmin, IconBell } from './icons';
 
 interface HeaderProps {
     userName?: string | null;
@@ -16,10 +14,10 @@ interface HeaderProps {
     isSuperAdmin?: boolean;
 }
 
-export default function Header({ userName, userEmail, isAdmin, isSuperAdmin }: HeaderProps) {
+// userName, userEmail은 이제 사용하지 않지만 상위 컴포넌트(RootLayout) 호환성을 위해 Props 인터페이스는 유지
+export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
     const [showHeader, setShowHeader] = useState(true);
     const lastScrollY = useRef(0);
-    const router = useRouter();
     const pathname = usePathname();
 
     // 현재 페이지가 Admin인지 확인
@@ -43,27 +41,25 @@ export default function Header({ userName, userEmail, isAdmin, isSuperAdmin }: H
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleLogout = useCallback(async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        router.push('/login');
-        router.refresh();
-    }, [router]);
-
-    const displayName = userName || userEmail?.split('@')[0] || '사용자';
-
     return (
         <header className={`${styles.header} ${!showHeader ? styles.hidden : ''}`}>
-            {/* 왼쪽: 사용자 이름 */}
+            {/* 왼쪽: 로고 (홈으로 이동) */}
             <div className={styles.left}>
-                <span className={styles.userName}>{displayName}님</span>
+                <Link href="/" className={styles.logoLink} title="홈으로">
+                    <span className={styles.logoText}>{APP_NAME}</span>
+                </Link>
             </div>
 
-            {/* 오른쪽: 네비게이션 링크 */}
+            {/* 오른쪽: 네비게이션 */}
             <nav className={styles.nav}>
+                {/* 1. 알림함 (공통) */}
+                <Link href="/notifications" className={styles.iconLink} title="알림함" aria-label="알림함">
+                    <IconBell />
+                </Link>
+
                 {isAdminPage ? (
                     <>
-                        {/* Admin 페이지에서 보이는 링크들 */}
+                        {/* Admin 페이지 */}
                         {isSuperAdmin && (
                             <Link href="/admin/users" className={styles.iconLink} title="회원 관리" aria-label="회원 관리">
                                 <IconUsers />
@@ -72,45 +68,21 @@ export default function Header({ userName, userEmail, isAdmin, isSuperAdmin }: H
                         <Link href="/admin/reservations" className={styles.iconLink} title="예약 관리" aria-label="예약 관리">
                             <IconCalendarCheck />
                         </Link>
-                        <Link href="/" className={styles.iconLinkFilled} title="홈으로" aria-label="홈으로">
-                            <IconHome />
-                        </Link>
-                    </>
-                ) : pathname === '/my' ? (
-                    <>
-                        {/* 내 예약 페이지에서 보이는 링크들 */}
-                        <Link href="/" className={styles.iconLink} title="홈" aria-label="홈">
-                            <IconHome />
-                        </Link>
-                        {isAdmin && (
-                            <Link href="/admin" className={styles.iconLinkFilled} title="관리자 페이지" aria-label="관리자 페이지">
-                                <IconAdmin />
-                            </Link>
-                        )}
                     </>
                 ) : (
                     <>
-                        {/* 메인 페이지에서 보이는 링크들 */}
-                        <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
-                            <IconCalendar />
-                        </Link>
+                        {/* 일반 페이지 */}
+                        {pathname !== '/my' && (
+                            <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
+                                <IconCalendar />
+                            </Link>
+                        )}
                         {isAdmin && (
                             <Link href="/admin" className={styles.iconLinkFilled} title="관리자 페이지" aria-label="관리자 페이지">
                                 <IconAdmin />
                             </Link>
                         )}
                     </>
-                )}
-
-                {/* 테마 토글 (옵션, 헤더에 넣을지 말지) */}
-                {/* <ThemeToggle /> */}
-
-                {/* 로그아웃: 아이콘으로 변경 */}
-                {/* 개발 환경에서만 보이는 조건이었으나, 아이콘화 했으므로 항상 보이거나 조건 유지 */}
-                {process.env.NODE_ENV === 'development' && (
-                    <button onClick={handleLogout} className={styles.iconButton} title="로그아웃" aria-label="로그아웃">
-                        <IconLogOut />
-                    </button>
                 )}
             </nav>
         </header>

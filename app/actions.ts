@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { Client as QStashClient } from "@upstash/qstash";
 import { startOfDay, endOfDay, subHours, isFuture } from 'date-fns';
 import { sendPushNotification } from '@/utils/push';
+import { saveNotification } from '@/utils/notification';
 
 // Defensive initialization of QStash
 const qstash = process.env.QSTASH_TOKEN
@@ -126,7 +127,8 @@ export async function createReservation(time: Date, serviceName: string = '기�
   try {
     const { data: admins } = await supabase
       .from('profiles')
-      .select('push_subscription')
+      .from('profiles')
+      .select('id, push_subscription')
       .in('role', ['owner', 'admin'])
       .not('push_subscription', 'is', null);
 
@@ -140,14 +142,17 @@ export async function createReservation(time: Date, serviceName: string = '기�
       const content = `${user.email}님이 ${timeStr}에 ${serviceName}(${duration}분) 예약을 요청했습니다.`;
 
       await Promise.allSettled(
-        admins.map(admin =>
-          sendPushNotification(
-            admin.push_subscription,
-            '새로운 예약 알림',
-            content,
-            '/admin/reservations'
-          )
-        )
+        admins.map(async (admin) => {
+          await saveNotification(admin.id, '새로운 예약 알림', content, '/admin/reservations');
+          if (admin.push_subscription) {
+            return sendPushNotification(
+              admin.push_subscription,
+              '새로운 예약 알림',
+              content,
+              '/admin/reservations'
+            );
+          }
+        })
       );
     }
   } catch (err) {
@@ -167,12 +172,17 @@ export async function createReservation(time: Date, serviceName: string = '기�
         month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
 
-      await sendPushNotification(
-        currentUserProfile.push_subscription,
-        '예약 대기 중',
-        `${timeStr} ${serviceName} 예약이 접수되었습니다. 확정 시 다시 알려드릴게요!`,
-        '/'
-      );
+      const message = `${timeStr} ${serviceName} 예약이 접수되었습니다. 확정 시 다시 알려드릴게요!`;
+      await saveNotification(user.id, '예약 접수', message, '/');
+
+      if (currentUserProfile?.push_subscription) {
+        await sendPushNotification(
+          currentUserProfile.push_subscription,
+          '예약 대기 중',
+          message,
+          '/'
+        );
+      }
     }
   } catch (err) {
     console.error('User notification failed:', err);
@@ -255,7 +265,8 @@ export async function cancelMyReservation(reservationId: string) {
   try {
     const { data: admins } = await supabase
       .from('profiles')
-      .select('push_subscription')
+      .from('profiles')
+      .select('id, push_subscription')
       .in('role', ['owner', 'admin'])
       .not('push_subscription', 'is', null);
 
@@ -265,14 +276,17 @@ export async function cancelMyReservation(reservationId: string) {
       });
 
       await Promise.allSettled(
-        admins.map(admin =>
-          sendPushNotification(
-            admin.push_subscription,
-            '예약 취소 알림',
-            `${user.email}님이 ${timeStr} 예약을 취소했습니다.`,
-            '/admin/reservations'
-          )
-        )
+        admins.map(async (admin) => {
+          await saveNotification(admin.id, '예약 취소 알림', `${user.email}님이 ${timeStr} 예약을 취소했습니다.`, '/admin/reservations');
+          if (admin.push_subscription) {
+            return sendPushNotification(
+              admin.push_subscription,
+              '예약 취소 알림',
+              `${user.email}님이 ${timeStr} 예약을 취소했습니다.`,
+              '/admin/reservations'
+            );
+          }
+        })
       );
     }
   } catch (err) {
@@ -291,6 +305,8 @@ export async function cancelMyReservation(reservationId: string) {
       const timeStr = new Date(reservation.time).toLocaleString('ko-KR', {
         month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
+
+      await saveNotification(user.id, '예약 취소 완료', `${timeStr} 예약이 정상적으로 취소되었습니다.`, '/my');
 
       await sendPushNotification(
         currentUserProfile.push_subscription,

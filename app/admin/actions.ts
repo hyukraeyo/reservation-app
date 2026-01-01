@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendPushNotification } from '@/utils/push'
+import { saveNotification } from '@/utils/notification'
 import type { Reservation } from '@/app/types'
 
 /**
@@ -122,15 +123,19 @@ export async function updateReservationStatus(
 
   if (error) return { error: error.message }
 
-  // 고객에게 알림 전송
+  // 고객에게 알림 전송 및 저장
   try {
     const subscription = reservation.profiles?.push_subscription
-    if (subscription) {
-      const title = status === 'confirmed' ? '예약이 확정되었습니다!' : '예약이 취소되었습니다.'
-      const body = status === 'confirmed'
-        ? `신청하신 ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 승인되었습니다.`
-        : `죄송합니다. ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 취소되었습니다.`
+    const title = status === 'confirmed' ? '예약이 확정되었습니다!' : '예약이 취소되었습니다.'
+    const body = status === 'confirmed'
+      ? `신청하신 ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 승인되었습니다.`
+      : `죄송합니다. ${new Date(reservation.time).toLocaleString('ko-KR')} 예약이 취소되었습니다.`
 
+    // DB에 알림 저장
+    await saveNotification(reservation.user_id, title, body, '/my')
+
+    // 푸시 전송
+    if (subscription) {
       await sendPushNotification(subscription, title, body, '/')
     }
   } catch (err) {
