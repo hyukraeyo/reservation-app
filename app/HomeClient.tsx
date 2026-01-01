@@ -36,10 +36,12 @@ export default function HomeClient({ initialReservedSlots = [] }: HomeClientProp
       setReservedSlots(slots || []);
     } catch (error) {
       console.error("Failed to fetch reserved slots", error);
+      setReservedSlots([]); // 에러 시 빈 배열로 설정
+      addToast('예약 정보를 불러오는 중 오류가 발생했습니다.', 'error');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [addToast]);
 
   // Service Worker 초기화 (백그라운드에서 비동기 처리)
   useEffect(() => {
