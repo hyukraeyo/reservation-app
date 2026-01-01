@@ -27,7 +27,9 @@
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: auto;
   backdrop-filter: blur(8px);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.4;
   max-width: calc(100vw - 2rem);
 
   :global(.dark) & {
