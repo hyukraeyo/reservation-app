@@ -14,8 +14,6 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
-  setHours,
-  setMinutes,
   isBefore,
   startOfDay
 } from 'date-fns';
@@ -105,6 +103,8 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     const slots: { time: string; disabled: boolean }[] = [];
     const isTodayDate = isToday(selectedDate);
     const now = new Date();
+    const nowHours = now.getHours();
+    const nowMinutes = now.getMinutes();
 
     const allBaseSlots: string[] = [];
     for (let hour = 10; hour <= 20; hour++) {
@@ -118,13 +118,14 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     // Map base slots to disabled status
     allBaseSlots.forEach((timeString, index) => {
       const [h, m] = timeString.split(':').map(Number);
-      const slotDate = setMinutes(setHours(selectedDate, h), m);
 
       let isDisabled = false;
 
-      // 1. Check past time
-      if (isTodayDate && isBefore(slotDate, now)) {
-        isDisabled = true;
+      // 1. Check past time (단순 시/분 비교로 시간대 문제 방지)
+      if (isTodayDate) {
+        if (h < nowHours || (h === nowHours && m <= nowMinutes)) {
+          isDisabled = true;
+        }
       }
 
       // 2. Check if this slot OR required future slots are occupied or out of bounds
@@ -190,7 +191,8 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     setSelectedTime(timeStr);
 
     const [hours, minutes] = timeStr.split(':').map(Number);
-    const combinedDate = setMinutes(setHours(selectedDate, hours), minutes);
+    const combinedDate = new Date(selectedDate);
+    combinedDate.setHours(hours, minutes, 0, 0);
     onSelect(combinedDate.toISOString());
   };
 
