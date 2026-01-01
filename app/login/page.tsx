@@ -116,7 +116,7 @@ function LoginForm() {
       <div className={styles.loginCard}>
         {loading && (
           <div className={styles.loadingOverlay}>
-            <LoadingSpinner size="medium" text="처리 중..." />
+            <LoadingSpinner size="medium" />
           </div>
         )}
         <div className={styles.header}>

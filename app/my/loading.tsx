@@ -11,7 +11,7 @@ export default function MyPageLoading() {
                 minHeight: '60vh',
                 width: '100%'
             }}>
-                <LoadingSpinner size="large" text="예약 내역을 불러오는 중..." />
+                <LoadingSpinner size="large" />
             </div>
         </main>
     );
