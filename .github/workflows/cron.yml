@@ -1,0 +1,16 @@
+name: Auto Cancel Cron
+
+on:
+  schedule:
+    - cron: '0 * * * *' # 매시간 0분에 실행 (KST 기준 매시간)
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Auto Cancel API
+        run: |
+          # --fail 옵션으로 API 호출 실패 시 워크플로우도 실패 처리
+          curl --fail -X GET "${{ secrets.APP_URL }}/api/cron/auto-cancel" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
