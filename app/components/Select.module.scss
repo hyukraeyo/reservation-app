@@ -1,0 +1,116 @@
+
+.container {
+    position: relative;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background: white;
+    border: 1px solid #e2e8f0; // Slate-200
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b; // Slate-800
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    gap: 0.5rem;
+
+    &:hover {
+        border-color: var(--primary-color); // Assuming CSS variable exists, else #22c55e
+        background: #f8fafc; // Slate-50
+    }
+
+    &.isOpen {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+    }
+}
+
+.arrow {
+    width: 14px;
+    height: 14px;
+    color: #64748b; // Slate-500
+    transition: transform 0.2s ease;
+
+    &.up {
+        transform: rotate(180deg);
+    }
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    min-width: 140px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 50;
+    overflow: hidden;
+    padding: 0.4rem;
+    animation: fadeIn 0.15s ease-out;
+
+    // Align right if it overflows (basic handling, mostly left aligned)
+    &.alignRight {
+        left: auto;
+        right: 0;
+    }
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: #475569; // Slate-600
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+
+    &:hover {
+        background: #f1f5f9; // Slate-100
+        color: #1e293b;
+    }
+
+    &.selected {
+        background: var(--primary-color); // Example
+        color: white;
+        font-weight: 600;
+
+        &:hover {
+            background: var(--primary-color);
+            filter: brightness(1.1);
+        }
+    }
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: transparent;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

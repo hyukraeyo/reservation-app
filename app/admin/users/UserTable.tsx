@@ -10,78 +10,13 @@ import { useConfirmModal } from '@/app/components/ConfirmModal'
 import Card from '@/app/components/Card'
 import { useToast, ToastContainer } from '@/app/components/Toast'
 
-// RoleSelector Component
-function RoleSelector({
-  currentRole,
-  onRoleChange,
-  isLoading,
-  isOpen,
-  onToggle
-}: {
-  currentRole: string | null,
-  onRoleChange: (role: string) => void,
-  isLoading: boolean,
-  isOpen: boolean,
-  onToggle: () => void
-}) {
-  const roleLabels: Record<string, string> = {
-    user: '손님',
-    owner: '사장님',
-    admin: '관리자'
-  }
+import Select, { Option } from '@/app/components/Select';
 
-  const role = currentRole || 'user'
-
-  return (
-    <div className={styles.roleBadgeContainer}>
-      <button
-        className={`${styles.roleBadge} ${styles[`role_${role}`]}`}
-        onClick={(e) => {
-          e.stopPropagation()
-          if (!isLoading) onToggle()
-        }}
-        disabled={isLoading}
-        title="권한 변경"
-      >
-        {isLoading ? (
-          <svg className={styles.spinner} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle className={styles.spinnerTrack} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className={styles.spinnerPath} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        ) : (
-          roleLabels[role]
-        )}
-      </button>
-
-      {isOpen && (
-        <>
-          <div
-            style={{ position: 'fixed', inset: 0, zIndex: 40 }}
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggle()
-            }}
-          />
-          <div className={styles.roleDropdown}>
-            {Object.entries(roleLabels).map(([key, label]) => (
-              <button
-                key={key}
-                className={role === key ? styles.active : ''}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onRoleChange(key)
-                  onToggle()
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
+const ROLE_OPTIONS: Option[] = [
+  { value: 'user', label: '손님' },
+  { value: 'owner', label: '사장님' },
+  { value: 'admin', label: '관리자' }
+];
 
 function UserMemo({ userId, initialMemo, addToast }: {
   userId: string,
@@ -196,18 +131,9 @@ export default function UserTable({ users }: { users: Profile[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
   const [searchTerm, setSearchTerm] = useState('')
-  const [openSelectorId, setOpenSelectorId] = useState<string | null>(null)
   const isProcessing = useRef(false)
   const router = useRouter()
   const { confirm, ModalComponent } = useConfirmModal()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (openSelectorId) setOpenSelectorId(null)
-    }
-    window.addEventListener('scroll', handleScroll, true)
-    return () => window.removeEventListener('scroll', handleScroll, true)
-  }, [openSelectorId])
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (isProcessing.current || loadingId) return
@@ -218,14 +144,10 @@ export default function UserTable({ users }: { users: Profile[] }) {
       variant: 'danger'
     })
 
-    if (!isConfirmed) {
-      setOpenSelectorId(null)
-      return
-    }
+    if (!isConfirmed) return
 
     isProcessing.current = true
     setLoadingId(userId)
-    setOpenSelectorId(null)
 
     try {
       const result = await updateUserRole(userId, newRole)
@@ -249,7 +171,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
     isProcessing.current = true
 
     try {
-      const { deleteUser } = await import('../actions'); // Dynamically import to avoid circular dependency issues if any, or just ensure it's imported at top
+      const { deleteUser } = await import('../actions');
       const result = await deleteUser(userId);
 
       if (result?.error) {
@@ -309,14 +231,38 @@ export default function UserTable({ users }: { users: Profile[] }) {
             <div className={styles.userInfo}>
               <div className={styles.userName}>
                 <span className={styles.userNameText}>{user.name || '이름 없음'}</span>
+
                 {/* Role Selector */}
-                <RoleSelector
-                  currentRole={user.role}
-                  onRoleChange={(role) => handleRoleChange(user.id, role)}
-                  isLoading={loadingId === user.id}
-                  isOpen={openSelectorId === user.id}
-                  onToggle={() => setOpenSelectorId(openSelectorId === user.id ? null : user.id)}
-                />
+                <div className={styles.roleBadgeContainer}>
+                  <Select
+                    value={user.role || 'user'}
+                    options={ROLE_OPTIONS}
+                    onChange={(newRole) => handleRoleChange(user.id, newRole)}
+                    triggerRender={(selectedOption, isOpen, toggle) => {
+                      const isLoading = loadingId === user.id;
+                      return (
+                        <button
+                          className={`${styles.roleBadge} ${styles[`role_${selectedOption?.value}`]}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isLoading) toggle();
+                          }}
+                          disabled={isLoading}
+                          title="권한 변경"
+                        >
+                          {isLoading ? (
+                            <svg className={styles.spinner} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <circle className={styles.spinnerTrack} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className={styles.spinnerPath} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : (
+                            selectedOption?.label
+                          )}
+                        </button>
+                      );
+                    }}
+                  />
+                </div>
                 <DeleteUserButton userId={user.id} userName={user.name || null} onDelete={handleDeleteUser} />
               </div>
               <div className={styles.userEmail}>{user.email}</div>

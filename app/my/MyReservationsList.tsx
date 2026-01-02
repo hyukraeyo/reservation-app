@@ -6,6 +6,7 @@ import CancelButton from './CancelButton';
 import { ToastContainer, useToast } from '@/app/components/Toast';
 import ShowMoreButton from '@/app/components/ShowMoreButton';
 import StatusBadge from '@/app/components/StatusBadge';
+import Select from '@/app/components/Select';
 import {
     formatReservationDate,
     canCancelReservation,
@@ -26,10 +27,9 @@ interface Reservation {
 
 interface MyReservationsListProps {
     initialReservations: Reservation[];
-    profile?: Profile | null;
 }
 
-export default function MyReservationsList({ initialReservations, profile }: MyReservationsListProps) {
+export default function MyReservationsList({ initialReservations }: MyReservationsListProps) {
     const { toasts, addToast } = useToast();
     const [displayCount, setDisplayCount] = useState(5);
     const [filter, setFilter] = useState<FilterType>('all');
@@ -66,34 +66,8 @@ export default function MyReservationsList({ initialReservations, profile }: MyR
     const remainingCount = filteredReservations.length - displayCount;
 
     return (
-        <>
+        <div className={styles.container}>
             <ToastContainer toasts={toasts} />
-
-            <ToastContainer toasts={toasts} />
-
-            {/* Profile Section for Naver Review */}
-            {profile && (
-                <div className={styles.profileCard}>
-                    <div className={styles.profileHeader}>
-                        {profile.avatar_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={profile.avatar_url} alt="Profile" className={styles.profileAvatar} />
-                        ) : (
-                            <div className={styles.profileAvatarPlaceholder}>
-                                {profile.name?.[0] || 'U'}
-                            </div>
-                        )}
-                        <div className={styles.profileInfo}>
-                            <h2 className={styles.profileName}>
-                                {profile.name || '사용자'}
-                                <span className={styles.profileRole}>{profile.role === 'admin' ? '관리자' : '회원'}</span>
-                            </h2>
-                            <p className={styles.profileEmail}>{profile.email}</p>
-                            {profile.phone && <p className={styles.profilePhone}>{profile.phone}</p>}
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Filter & Sort Controls */}
             {initialReservations.length > 0 && (
@@ -109,15 +83,13 @@ export default function MyReservationsList({ initialReservations, profile }: MyR
                             </button>
                         ))}
                     </div>
-                    <select
-                        className={styles.sortSelect}
+                    <Select
                         value={sort}
-                        onChange={(e) => setSort(e.target.value as SortType)}
-                    >
-                        {SORT_OPTIONS.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                    </select>
+                        onChange={(val) => setSort(val as SortType)}
+                        options={SORT_OPTIONS}
+                        className={styles.sortSelectContainer}
+                        align="right"
+                    />
                 </div>
             )}
 
@@ -180,7 +152,7 @@ export default function MyReservationsList({ initialReservations, profile }: MyR
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 
