@@ -104,7 +104,6 @@ export default function UserTable({ users }: { users: Profile[] }) {
 
           {/* Role Section */}
           <div className={styles.roleSection}>
-            <span className={styles.roleLabel}>권한</span>
             <select
               value={user.role || 'user'}
               onChange={(e) => handleRoleChange(user.id, e.target.value)}

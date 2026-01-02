@@ -105,18 +105,13 @@
   border-top: 1px solid var(--border-color);
 }
 
-.roleLabel {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
+// .roleLabel was removed
 
 .roleSelect {
   flex: 1;
   padding: 0.6rem 1rem;
   border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #d1d5db; /* 보더 색상 진하게 변경 */
   background: var(--bg-main);
   color: var(--text-main);
   font-size: 0.9rem;
@@ -124,7 +119,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2.5rem;

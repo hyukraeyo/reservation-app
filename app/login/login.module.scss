@@ -9,6 +9,10 @@
   position: relative;
   overflow: hidden;
 
+  @media (max-width: 480px) {
+    padding: 1rem; /* 모바일 컨테이너 패딩 축소 */
+  }
+
   :global(.dark) & {
     background: radial-gradient(circle at top left, #0f172a, #020617);
   }
@@ -59,8 +63,9 @@
   }
 
   @media (max-width: 480px) {
-    padding: 2rem;
-    gap: 2rem;
+    padding: 1.5rem; /* 모바일 카드 내부 패딩 축소 */
+    gap: 1.5rem;
+    border-radius: 20px; /* 모바일에서 둥글기 약간 축소 */
   }
 }
 
