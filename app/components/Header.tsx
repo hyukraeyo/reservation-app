@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Header.module.scss';
 import { APP_NAME } from '@/app/constants';
 import { IconCalendar, IconCalendarCheck, IconUsers, IconAdmin, IconBell } from './icons';
+import { createClient } from '@/utils/supabase/client';
 
 interface HeaderProps {
     userName?: string | null;
@@ -14,14 +15,50 @@ interface HeaderProps {
     isSuperAdmin?: boolean;
 }
 
-// userName, userEmail은 이제 사용하지 않지만 상위 컴포넌트(RootLayout) 호환성을 위해 Props 인터페이스는 유지
+const CLICK_THRESHOLD = 5; // 클릭 횟수
+const CLICK_TIMEOUT = 1000; // 1초 내에 클릭해야 함
+
 export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
     const [showHeader, setShowHeader] = useState(true);
+    const [showLogout, setShowLogout] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
     const lastScrollY = useRef(0);
+    const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pathname = usePathname();
+    const router = useRouter();
 
-    // 현재 페이지가 Admin인지 확인
     const isAdminPage = pathname?.startsWith('/admin');
+
+    // 로고 클릭 핸들러
+    const handleLogoClick = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+
+        // 타임아웃 리셋
+        if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+        }
+
+        const newCount = clickCount + 1;
+        setClickCount(newCount);
+
+        if (newCount >= CLICK_THRESHOLD) {
+            setShowLogout(prev => !prev);
+            setClickCount(0);
+        } else {
+            // 1초 후 카운트 리셋
+            clickTimeoutRef.current = setTimeout(() => {
+                setClickCount(0);
+            }, CLICK_TIMEOUT);
+        }
+    }, [clickCount]);
+
+    // 로그아웃 핸들러
+    const handleLogout = async () => {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.push('/login');
+        router.refresh();
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -38,28 +75,45 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (clickTimeoutRef.current) {
+                clearTimeout(clickTimeoutRef.current);
+            }
+        };
     }, []);
 
     return (
         <header className={`${styles.header} ${!showHeader ? styles.hidden : ''}`}>
-            {/* 왼쪽: 로고 (홈으로 이동) */}
+            {/* 왼쪽: 로고 (5회 클릭 시 로그아웃 토글) */}
             <div className={styles.left}>
-                <Link href="/" className={styles.logoLink} title="홈으로">
+                <button
+                    onClick={handleLogoClick}
+                    className={styles.logoButton}
+                    title="홈으로"
+                >
                     <span className={styles.logoText}>{APP_NAME}</span>
-                </Link>
+                </button>
+
+                {/* 숨겨진 로그아웃 버튼 */}
+                {showLogout && (
+                    <button
+                        onClick={handleLogout}
+                        className={styles.logoutButton}
+                    >
+                        로그아웃
+                    </button>
+                )}
             </div>
 
             {/* 오른쪽: 네비게이션 */}
             <nav className={styles.nav}>
-                {/* 1. 알림함 (공통) */}
                 <Link href="/notifications" className={styles.iconLink} title="알림함" aria-label="알림함">
                     <IconBell />
                 </Link>
 
                 {isAdminPage ? (
                     <>
-                        {/* Admin 페이지 */}
                         {isSuperAdmin && (
                             <Link href="/admin/users" className={styles.iconLink} title="회원 관리" aria-label="회원 관리">
                                 <IconUsers />
@@ -71,7 +125,6 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
                     </>
                 ) : (
                     <>
-                        {/* 일반 페이지 */}
                         <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
                             <IconCalendar />
                         </Link>
@@ -86,3 +139,4 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
         </header>
     );
 }
+
