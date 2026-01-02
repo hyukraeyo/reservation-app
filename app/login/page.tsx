@@ -1,4 +1,3 @@
-
 'use client'
 
 import styles from './login.module.scss'
@@ -14,6 +13,7 @@ function LoginForm() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+  const [phone, setPhone] = useState('');
 
   // Supabase/Auth Error Mapping
   const getErrorMessage = (error: string) => {
@@ -41,6 +41,22 @@ function LoginForm() {
       setMessage({ type: 'error', text: getErrorMessage(error) });
     }
   }, [error, code]);
+
+  // 전화번호 포맷팅 핸들러
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 추출
+    let formatted = '';
+
+    if (value.length <= 3) {
+      formatted = value;
+    } else if (value.length <= 7) {
+      formatted = `${value.slice(0, 3)}-${value.slice(3)}`;
+    } else {
+      formatted = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
+    }
+
+    setPhone(formatted);
+  };
 
   // Using simple form submission for now to demonstrate UI
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -184,6 +200,9 @@ function LoginForm() {
                   type="tel"
                   placeholder="010-0000-0000"
                   required
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  maxLength={13}
                   pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}"
                   title="010-0000-0000 형식으로 입력해주세요."
                 />
@@ -242,6 +261,7 @@ function LoginForm() {
               onClick={() => {
                 setMode(mode === 'login' ? 'signup' : 'login')
                 setMessage(null)
+                setPhone('')
               }}
             >
               {mode === 'login' ? '계정 만들기' : '이미 계정이 있어요'}
