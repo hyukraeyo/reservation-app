@@ -1,6 +1,6 @@
 'use client'
 
-import { updateUserRole } from '../actions'
+import { updateUserRole, updateUserMemo } from '../actions'
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Profile } from '@/app/types'
@@ -8,10 +8,87 @@ import styles from './users.module.scss'
 import ShowMoreButton from '@/app/components/ShowMoreButton'
 import { useConfirmModal } from '@/app/components/ConfirmModal'
 import Card from '@/app/components/Card'
+import { useToast, ToastContainer } from '@/app/components/Toast'
+
+function UserMemo({ userId, initialMemo, addToast }: {
+  userId: string,
+  initialMemo: string | null,
+  addToast: (message: string, type: 'success' | 'error' | 'info') => void
+}) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [memo, setMemo] = useState(initialMemo || '')
+  const [tempMemo, setTempMemo] = useState(initialMemo || '')
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleEdit = () => {
+    setTempMemo(memo)
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+    setTempMemo(memo)
+  }
+
+  const handleSave = async () => {
+    if (isSaving) return
+    setIsSaving(true)
+    try {
+      const result = await updateUserMemo(userId, tempMemo)
+      if (result?.success) {
+        setMemo(tempMemo)
+        setIsEditing(false)
+        addToast('메모가 저장되었습니다.', 'success')
+      } else {
+        addToast('저장 실패: ' + (result?.error || '알 수 없는 오류'), 'error')
+      }
+    } catch (e: any) {
+      addToast('오류 발생: ' + e.message, 'error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  return (
+    <div className={styles.memoSection}>
+      <div className={styles.memoHeader}>
+        <label>관리자 메모</label>
+        {!isEditing && (
+          <button onClick={handleEdit}>
+            {memo ? '수정' : '추가 +'}
+          </button>
+        )}
+      </div>
+
+      {isEditing ? (
+        <>
+          <textarea
+            value={tempMemo}
+            onChange={e => setTempMemo(e.target.value)}
+            placeholder="손님에 대한 메모를 입력하세요 (예: 알러지, 단골 여부 등)"
+            autoFocus
+          />
+          <div className={styles.memoActions}>
+            <button className={styles.btnCancel} onClick={handleCancel} disabled={isSaving}>취소</button>
+            <button className={styles.btnSave} onClick={handleSave} disabled={isSaving}>
+              {isSaving ? '저장...' : '저장'}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className={`${styles.memoContent} ${!memo ? styles.empty : ''}`} onClick={handleEdit} style={{ cursor: 'pointer' }}>
+          {memo || '등록된 메모가 없습니다. 내용을 추가하려면 클릭하세요.'}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function UserTable({ users }: { users: Profile[] }) {
+  const { toasts, addToast } = useToast()
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
+  const [searchTerm, setSearchTerm] = useState('')
   const isProcessing = useRef(false)
   const router = useRouter()
   const { confirm, ModalComponent } = useConfirmModal()
@@ -26,7 +103,6 @@ export default function UserTable({ users }: { users: Profile[] }) {
     })
 
     if (!isConfirmed) {
-      // 취소 시 원래 값으로 되돌리기 위해 새로고침 (간단한 방법)
       router.refresh()
       return
     }
@@ -37,14 +113,14 @@ export default function UserTable({ users }: { users: Profile[] }) {
     try {
       const result = await updateUserRole(userId, newRole)
       if (result?.error) {
-        alert('역할 변경에 실패했습니다: ' + result.error)
+        addToast('역할 변경에 실패했습니다: ' + result.error, 'error')
       } else {
-        // 성공 시 데이터 리프레시
         router.refresh()
+        addToast('권한이 변경되었습니다.', 'success')
       }
     } catch (e: unknown) {
       console.error(e)
-      alert('상태 변경 중 오류가 발생했습니다.')
+      addToast('상태 변경 중 오류가 발생했습니다.', 'error')
     } finally {
       setLoadingId(null)
       isProcessing.current = false
@@ -55,15 +131,35 @@ export default function UserTable({ users }: { users: Profile[] }) {
     return <div className={styles.emptyState}>사용자가 없습니다.</div>
   }
 
-  const visibleUsers = users.slice(0, displayCount)
-  const hasMore = users.length > displayCount
+  const filteredUsers = users.filter((user) => {
+    const term = searchTerm.toLowerCase()
+    return (
+      (user.name?.toLowerCase() || '').includes(term) ||
+      (user.email?.toLowerCase() || '').includes(term) ||
+      (user.phone || '').includes(term)
+    )
+  })
+
+  const visibleUsers = filteredUsers.slice(0, displayCount)
+  const hasMore = filteredUsers.length > displayCount
 
   return (
     <div className={styles.container}>
+      <ToastContainer toasts={toasts} />
       {ModalComponent}
+
+      <div className={styles.searchContainer}>
+        <input
+          type="text"
+          placeholder="🔍 이름, 이메일, 전화번호 검색..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       {visibleUsers.map(user => (
         <Card key={user.id}>
-          {/* Header: Avatar + Name/Email */}
+          {/* Header */}
           <div className={styles.userHeader}>
             {user.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -77,7 +173,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
             </div>
           </div>
 
-          {/* Details Grid */}
+          {/* Details */}
           <div className={styles.detailsGrid}>
             <div className={styles.detailItem}>
               <label>연락처</label>
@@ -98,12 +194,16 @@ export default function UserTable({ users }: { users: Profile[] }) {
               </span>
             </div>
             <div className={styles.detailItem}>
+              <label>가입일</label>
+              <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</span>
+            </div>
+            <div className={styles.detailItem}>
               <label>ID</label>
               <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{user.id.slice(0, 8)}...</span>
             </div>
           </div>
 
-          {/* Role Section */}
+          {/* Role */}
           <div className={styles.roleSection}>
             <select
               value={user.role || 'user'}
@@ -120,13 +220,16 @@ export default function UserTable({ users }: { users: Profile[] }) {
           {loadingId === user.id && (
             <div className={styles.loadingText}>설정 저장 중...</div>
           )}
+
+          {/* Memo */}
+          <UserMemo userId={user.id} initialMemo={user.memo} addToast={addToast} />
         </Card>
       ))}
 
       {hasMore && (
         <ShowMoreButton
           onClick={() => setDisplayCount(prev => prev + 5)}
-          remainingCount={users.length - displayCount}
+          remainingCount={filteredUsers.length - displayCount}
           label="사용자 더보기"
         />
       )}
