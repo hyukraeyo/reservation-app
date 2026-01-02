@@ -10,10 +10,10 @@ interface FilterOption {
 }
 
 interface FilterSortBarProps<T extends string, S extends string> {
-    filterOptions: FilterOption[];
+    filterOptions: readonly FilterOption[];
     currentFilter: T;
     onFilterChange: (filter: T) => void;
-    sortOptions: Option[];
+    sortOptions: readonly Option[];
     currentSort: S;
     onSortChange: (sort: S) => void;
     className?: string; // Allow external override for margin etc. but internal structure is fixed

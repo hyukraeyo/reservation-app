@@ -10,7 +10,7 @@ export interface Option {
 
 interface SelectProps {
     value: string;
-    options: Option[];
+    options: readonly Option[];
     onChange: (value: string) => void;
     placeholder?: string;
     className?: string;
