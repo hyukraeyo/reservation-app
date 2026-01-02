@@ -2,17 +2,33 @@
 
 import { updateUserRole } from '../actions'
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { Profile } from '@/app/types'
 import styles from './users.module.scss'
 import ShowMoreButton from '@/app/components/ShowMoreButton'
+import { useConfirmModal } from '@/app/components/ConfirmModal'
 
 export default function UserTable({ users }: { users: Profile[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
   const isProcessing = useRef(false)
+  const router = useRouter()
+  const { confirm, ModalComponent } = useConfirmModal()
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (isProcessing.current || loadingId) return
+
+    const isConfirmed = await confirm({
+      title: '권한 변경',
+      message: '정말 이 사용자의 권한을 변경하시겠습니까?',
+      variant: 'danger'
+    })
+
+    if (!isConfirmed) {
+      // 취소 시 원래 값으로 되돌리기 위해 새로고침 (간단한 방법)
+      router.refresh()
+      return
+    }
 
     isProcessing.current = true
     setLoadingId(userId)
@@ -21,6 +37,9 @@ export default function UserTable({ users }: { users: Profile[] }) {
       const result = await updateUserRole(userId, newRole)
       if (result?.error) {
         alert('역할 변경에 실패했습니다: ' + result.error)
+      } else {
+        // 성공 시 데이터 리프레시
+        router.refresh()
       }
     } catch (e: unknown) {
       console.error(e)
@@ -40,6 +59,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
 
   return (
     <div className={styles.container}>
+      {ModalComponent}
       {visibleUsers.map(user => (
         <div key={user.id} className={styles.userCard}>
           {/* Header: Avatar + Name/Email */}
@@ -86,7 +106,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
           <div className={styles.roleSection}>
             <span className={styles.roleLabel}>권한</span>
             <select
-              defaultValue={user.role || 'user'}
+              value={user.role || 'user'}
               onChange={(e) => handleRoleChange(user.id, e.target.value)}
               disabled={!!loadingId}
               className={styles.roleSelect}
@@ -113,4 +133,5 @@ export default function UserTable({ users }: { users: Profile[] }) {
     </div>
   )
 }
+
 

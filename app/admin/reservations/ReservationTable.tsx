@@ -10,6 +10,7 @@ import ShowMoreButton from '@/app/components/ShowMoreButton'
 import { ToastContainer, useToast } from '@/app/components/Toast'
 import StatusBadge from '@/app/components/StatusBadge'
 import { formatReservationDate, FILTER_OPTIONS, SORT_OPTIONS, FilterType, SortType } from '@/utils/reservation'
+import { useConfirmModal } from '@/app/components/ConfirmModal'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -19,6 +20,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   const [sort, setSort] = useState<SortType>('created-desc')
   const router = useRouter()
   const { toasts, addToast } = useToast()
+  const { confirm, ModalComponent } = useConfirmModal()
 
   // Filter and sort reservations
   const filteredReservations = useMemo(() => {
@@ -46,6 +48,17 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
     if (loadingId === id) return
 
+    const actionName = status === 'confirmed' ? '승인' : '취소';
+    const variant = status === 'confirmed' ? 'default' : 'danger';
+
+    const isConfirmed = await confirm({
+      title: `예약 ${actionName}`,
+      message: `정말 이 예약을 ${actionName}하시겠습니까?`,
+      variant: variant
+    });
+
+    if (!isConfirmed) return;
+
     setLoadingId(id)
     setLoadingAction(status)
     try {
@@ -72,6 +85,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   return (
     <>
       <ToastContainer toasts={toasts} />
+      {ModalComponent}
 
       {/* Filter & Sort Controls */}
       {reservations.length > 0 && (
@@ -160,6 +174,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
     </>
   )
 }
+
 
 
 

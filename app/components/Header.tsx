@@ -7,6 +7,7 @@ import styles from './Header.module.scss';
 import { APP_NAME } from '@/app/constants';
 import { IconCalendar, IconCalendarCheck, IconUsers, IconAdmin, IconBell } from './icons';
 import { createClient } from '@/utils/supabase/client';
+import { useConfirmModal } from '@/app/components/ConfirmModal';
 
 interface HeaderProps {
     userName?: string | null;
@@ -26,6 +27,7 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
     const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pathname = usePathname();
     const router = useRouter();
+    const { confirm, ModalComponent } = useConfirmModal();
 
     const isAdminPage = pathname?.startsWith('/admin');
 
@@ -54,10 +56,18 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
 
     // 로그아웃 핸들러
     const handleLogout = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-        router.push('/login');
-        router.refresh();
+        const isConfirmed = await confirm({
+            title: '로그아웃',
+            message: '정말 로그아웃 하시겠습니까?',
+            variant: 'danger'
+        });
+
+        if (isConfirmed) {
+            const supabase = createClient();
+            await supabase.auth.signOut();
+            router.push('/login');
+            router.refresh();
+        }
     };
 
     useEffect(() => {
@@ -85,6 +95,7 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
 
     return (
         <header className={`${styles.header} ${!showHeader ? styles.hidden : ''}`}>
+            {ModalComponent}
             {/* 왼쪽: 로고 (5회 클릭 시 로그아웃 토글) */}
             <div className={styles.left}>
                 <button
@@ -139,4 +150,3 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
         </header>
     );
 }
-
