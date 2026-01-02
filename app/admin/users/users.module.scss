@@ -171,13 +171,17 @@
   font-size: 1.05rem;
   color: var(--text-main);
   margin-bottom: 0.15rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.userNameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 0.2rem;
 }
 
 .userEmail {

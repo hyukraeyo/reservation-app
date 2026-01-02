@@ -226,7 +226,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
             )}
             <div className={styles.userInfo}>
               <div className={styles.userName}>
-                {user.name || '이름 없음'}
+                <span className={styles.userNameText}>{user.name || '이름 없음'}</span>
                 {/* Role Selector */}
                 <RoleSelector
                   currentRole={user.role}
