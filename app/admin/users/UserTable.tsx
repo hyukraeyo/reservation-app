@@ -197,10 +197,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
               <label>가입일</label>
               <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</span>
             </div>
-            <div className={styles.detailItem}>
-              <label>ID</label>
-              <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{user.id.slice(0, 8)}...</span>
-            </div>
+
           </div>
 
           {/* Role */}
