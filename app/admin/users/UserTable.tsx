@@ -115,8 +115,9 @@ function UserMemo({ userId, initialMemo, addToast }: {
       } else {
         addToast('저장 실패: ' + (result?.error || '알 수 없는 오류'), 'error')
       }
-    } catch (e: any) {
-      addToast('오류 발생: ' + e.message, 'error')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '알 수 없는 오류'
+      addToast('오류 발생: ' + message, 'error')
     } finally {
       setIsSaving(false)
     }

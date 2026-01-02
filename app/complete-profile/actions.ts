@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { Profile } from '@/app/types'
 
 export async function updateUserProfile(formData: { name: string; phone: string }) {
     const supabase = await createClient()
@@ -12,7 +13,7 @@ export async function updateUserProfile(formData: { name: string; phone: string 
         return { error: '사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.' }
     }
 
-    const updates: any = {}
+    const updates: Partial<Profile> = {}
 
     // 유효한 값만 업데이트 객체에 포함
     if (formData.name && formData.name.trim()) updates.name = formData.name

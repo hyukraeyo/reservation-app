@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import styles from './admin.module.scss'
 import Card from '@/app/components/Card'
 import LiveReservationList from './LiveReservationList'
@@ -6,13 +5,11 @@ import { Reservation } from '@/app/types'
 
 interface AdminDashboardProps {
   initialReservations: Reservation[];
-  isSuperAdmin: boolean;
 }
 
 // 프레젠테이션 컴포넌트 - 데이터는 page.tsx에서 주입받음
 export default function AdminDashboard({
-  initialReservations,
-  isSuperAdmin
+  initialReservations
 }: AdminDashboardProps) {
   return (
     <div className={styles.container}>

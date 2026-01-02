@@ -88,7 +88,7 @@ export default function CompleteProfilePage() {
                 router.replace('/')
             }
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Profile update error:', error)
             alert('저장 중 알 수 없는 오류가 발생했습니다.')
             setSaving(false)
