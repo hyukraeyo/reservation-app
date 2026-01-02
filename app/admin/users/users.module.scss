@@ -1,10 +1,139 @@
+.searchContainer {
+    margin-bottom: 1.5rem;
+
+    input {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 1rem;
+        background: var(--bg-card);
+        color: var(--text-main);
+        transition: all 0.2s;
+
+        &:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+        }
+
+        &::placeholder {
+            color: var(--text-secondary);
+        }
+    }
+}
+
+.memoSection {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+
+    .memoHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        button {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            
+            &:hover {
+                background: var(--bg-hover);
+                border-radius: 4px;
+            }
+        }
+    }
+
+    .memoContent {
+        font-size: 0.9rem;
+        color: var(--text-main);
+        white-space: pre-wrap;
+        padding: 0.75rem;
+        background: var(--bg-hover);
+        border-radius: 8px;
+        min-height: 2.5rem;
+        line-height: 1.5;
+
+        &.empty {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+    }
+
+    textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        resize: vertical;
+        margin-bottom: 0.5rem;
+        background: var(--bg-card);
+        color: var(--text-main);
+        min-height: 80px;
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+    }
+
+    .memoActions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+
+        button {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btnSave {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+
+            &:hover {
+                filter: brightness(1.1);
+            }
+            &:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+        }
+
+        .btnCancel {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+
+            &:hover {
+                background: var(--bg-hover);
+            }
+        }
+    }
+}
+
 .container {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
-
-// .userCard removed, using shared Card component
 
 .userHeader {
   display: flex;
@@ -45,6 +174,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .userEmail {
@@ -84,49 +217,6 @@
   }
 }
 
-.roleSection {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border-color);
-}
-
-// .roleLabel was removed
-
-.roleSelect {
-  flex: 1;
-  padding: 0.6rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #cbd5e1; /* 보더 1px로 조정 */
-  background: var(--bg-main);
-  color: var(--text-main);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  padding-right: 2.5rem;
-
-  &:hover {
-    border-color: var(--primary-color);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-light);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
 .loadingText {
   text-align: center;
   font-size: 0.8rem;
@@ -135,6 +225,7 @@
   padding: 0.5rem;
   background: var(--primary-light);
   border-radius: 8px;
+  margin-top: 0.5rem;
 }
 
 .emptyState {
@@ -144,4 +235,97 @@
   background: var(--bg-card);
   border-radius: 20px;
   border: 1px dashed var(--border-color);
+}
+
+// Role Badge & Dropdown Styles
+.roleBadgeContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  
+  &.role_user { 
+    background-color: #f3f4f6; 
+    color: #4b5563; 
+    border-color: #e5e7eb;
+  }
+  &.role_owner { 
+    background-color: #dcfce7; 
+    color: #15803d; 
+    border-color: #bbf7d0;
+  }
+  &.role_admin { 
+    background-color: #fee2e2; 
+    color: #b91c1c; 
+    border-color: #fecaca;
+  }
+  
+  &:hover:not(:disabled) { 
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    filter: brightness(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+}
+
+.roleDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  z-index: 50;
+  min-width: 100px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem;
+  animation: fadeIn 0.15s ease-out;
+
+  button {
+    text-align: left;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+    border-radius: 6px;
+    transition: all 0.15s;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+    
+    &.active {
+      font-weight: 600;
+      color: var(--primary-color);
+      background-color: #eff6ff;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

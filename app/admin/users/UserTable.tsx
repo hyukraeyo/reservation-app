@@ -10,6 +10,63 @@ import { useConfirmModal } from '@/app/components/ConfirmModal'
 import Card from '@/app/components/Card'
 import { useToast, ToastContainer } from '@/app/components/Toast'
 
+// RoleSelector Component
+function RoleSelector({
+  currentRole,
+  onRoleChange,
+  isLoading
+}: {
+  currentRole: string | null,
+  onRoleChange: (role: string) => void,
+  isLoading: boolean
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const roleLabels: Record<string, string> = {
+    user: '손님',
+    owner: '사장님',
+    admin: '관리자'
+  }
+
+  const role = currentRole || 'user'
+
+  return (
+    <div className={styles.roleBadgeContainer}>
+      <button
+        className={`${styles.roleBadge} ${styles[`role_${role}`]} ${isLoading ? styles.loading : ''}`}
+        onClick={() => !isLoading && setIsOpen(!isOpen)}
+        disabled={isLoading}
+        title="권한 변경"
+      >
+        {roleLabels[role]}
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+            onClick={() => setIsOpen(false)}
+          />
+          <div className={styles.roleDropdown}>
+            {Object.entries(roleLabels).map(([key, label]) => (
+              <button
+                key={key}
+                className={role === key ? styles.active : ''}
+                onClick={() => {
+                  onRoleChange(key)
+                  setIsOpen(false)
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 function UserMemo({ userId, initialMemo, addToast }: {
   userId: string,
   initialMemo: string | null,
@@ -168,7 +225,15 @@ export default function UserTable({ users }: { users: Profile[] }) {
               <div className={styles.avatarPlaceholder}>👤</div>
             )}
             <div className={styles.userInfo}>
-              <div className={styles.userName}>{user.name || '이름 없음'}</div>
+              <div className={styles.userName}>
+                {user.name || '이름 없음'}
+                {/* Role Selector */}
+                <RoleSelector
+                  currentRole={user.role}
+                  onRoleChange={(role) => handleRoleChange(user.id, role)}
+                  isLoading={loadingId === user.id}
+                />
+              </div>
               <div className={styles.userEmail}>{user.email}</div>
             </div>
           </div>
@@ -197,21 +262,6 @@ export default function UserTable({ users }: { users: Profile[] }) {
               <label>가입일</label>
               <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</span>
             </div>
-
-          </div>
-
-          {/* Role */}
-          <div className={styles.roleSection}>
-            <select
-              value={user.role || 'user'}
-              onChange={(e) => handleRoleChange(user.id, e.target.value)}
-              disabled={!!loadingId}
-              className={styles.roleSelect}
-            >
-              <option value="user">일반 사용자</option>
-              <option value="owner">사장님</option>
-              <option value="admin">관리자</option>
-            </select>
           </div>
 
           {loadingId === user.id && (
