@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 import { Suspense } from 'react'
 import AuthenticatedHeader from '@/app/components/AuthenticatedHeader'
 import HeaderSkeleton from '@/app/components/HeaderSkeleton'
+import SplashScreen from '@/app/components/SplashScreen'
 
 export const metadata: Metadata = {
   title: "m9",
@@ -78,6 +79,7 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning className={pretendard.variable}>
       <body className={pretendard.className}>
         <Providers>
+          <SplashScreen />
           <Suspense fallback={<HeaderSkeleton />}>
             <AuthenticatedHeader />
           </Suspense>
