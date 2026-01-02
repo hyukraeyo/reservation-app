@@ -1,2 +1,0 @@
-app/admin/users/UserTable.tsx(296,38): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | null'.
-  Type 'undefined' is not assignable to type 'string | null'.
