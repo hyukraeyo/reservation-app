@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { sendPushNotification } from '@/utils/push'
 import { saveNotification } from '@/utils/notification'
 import type { Reservation } from '@/app/types'
@@ -61,7 +62,9 @@ export async function checkSuperAdmin(): Promise<boolean> {
  */
 export async function getUsers() {
   const isSuperAdmin = await checkSuperAdmin()
-  if (!isSuperAdmin) throw new Error('최고 관리자만 사용자 목록을 볼 수 있습니다.')
+  if (!isSuperAdmin) {
+    redirect('/')
+  }
 
   // 1. Profiles (DB)
   const supabase = await createClient()
