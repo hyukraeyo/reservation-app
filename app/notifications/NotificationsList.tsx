@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from './notifications.module.scss';
 import ShowMoreButton from '@/app/components/ShowMoreButton';
+import Card from '@/app/components/Card';
 
 interface Notification {
     id: string;
@@ -37,11 +38,11 @@ export default function NotificationsList({ notifications }: NotificationsListPr
     return (
         <div className={styles.list}>
             {visibleNotifications.map((n) => (
-                <div key={n.id} className={`${styles.item} ${n.is_read ? styles.read : styles.unread}`}>
+                <Card key={n.id} className={`${styles.item} ${n.is_read ? styles.read : styles.unread}`}>
                     <div className={styles.title}>{n.title}</div>
                     <div className={styles.message}>{n.message}</div>
                     <div className={styles.time}>{new Date(n.created_at).toLocaleString('ko-KR')}</div>
-                </div>
+                </Card>
             ))}
 
             {hasMore && (

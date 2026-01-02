@@ -45,20 +45,12 @@
 
 .item {
   position: relative;
-  background: var(--bg-card);
-  padding: 1.5rem;
-  border-radius: 20px;
-  border: 1px solid transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  transition: all 0.2s ease;
-
+  /* Card 컴포넌트 스타일 상속 */
+  
   /* 안 읽은 알림: 살짝 띄우고 포인트 컬러 */
   &.unread {
-    background: var(--bg-card);
-    border-color: rgba(15, 118, 110, 0.1); 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-color: rgba(15, 118, 110, 0.5); /* 읽지 않음 강조 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     
     .title {
       color: var(--primary-color);

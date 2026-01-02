@@ -11,6 +11,7 @@ import { ToastContainer, useToast } from '@/app/components/Toast'
 import StatusBadge from '@/app/components/StatusBadge'
 import { formatReservationDate, FILTER_OPTIONS, SORT_OPTIONS, FilterType, SortType } from '@/utils/reservation'
 import { useConfirmModal } from '@/app/components/ConfirmModal'
+import Card from '@/app/components/Card'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -126,7 +127,10 @@ export default function ReservationTable({ reservations }: { reservations: Reser
               const isThisLoading = loadingId === res.id;
 
               return (
-                <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
+                <Card
+                  key={res.id}
+                  className={styles[`status-${res.status}`]}
+                >
                   <div className={styles.resHeader}>
                     <div className={styles.resInfo}>
                       <div className={styles.resDate}>{fullDate}</div>
@@ -158,7 +162,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                       </button>
                     </div>
                   )}
-                </div>
+                </Card>
               )
             })}
           </div>
@@ -174,7 +178,3 @@ export default function ReservationTable({ reservations }: { reservations: Reser
     </>
   )
 }
-
-
-
-

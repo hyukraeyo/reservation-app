@@ -4,20 +4,7 @@
   gap: 0.75rem;
 }
 
-.userCard {
-  background: var(--bg-card);
-  border-radius: 20px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-  }
-}
+// .userCard removed, using shared Card component
 
 .userHeader {
   display: flex;
@@ -111,7 +98,7 @@
   flex: 1;
   padding: 0.6rem 1rem;
   border-radius: 12px;
-  border: 2px solid #cbd5e1; /* 보더 2px로 강화 */
+  border: 1px solid #cbd5e1; /* 보더 1px로 조정 */
   background: var(--bg-main);
   color: var(--text-main);
   font-size: 0.9rem;
@@ -119,7 +106,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* 화살표 진하게 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2.5rem;

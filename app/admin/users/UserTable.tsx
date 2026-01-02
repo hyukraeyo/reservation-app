@@ -7,6 +7,7 @@ import { Profile } from '@/app/types'
 import styles from './users.module.scss'
 import ShowMoreButton from '@/app/components/ShowMoreButton'
 import { useConfirmModal } from '@/app/components/ConfirmModal'
+import Card from '@/app/components/Card'
 
 export default function UserTable({ users }: { users: Profile[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -61,7 +62,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
     <div className={styles.container}>
       {ModalComponent}
       {visibleUsers.map(user => (
-        <div key={user.id} className={styles.userCard}>
+        <Card key={user.id}>
           {/* Header: Avatar + Name/Email */}
           <div className={styles.userHeader}>
             {user.avatar_url ? (
@@ -119,7 +120,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
           {loadingId === user.id && (
             <div className={styles.loadingText}>설정 저장 중...</div>
           )}
-        </div>
+        </Card>
       ))}
 
       {hasMore && (
@@ -132,5 +133,3 @@ export default function UserTable({ users }: { users: Profile[] }) {
     </div>
   )
 }
-
-
