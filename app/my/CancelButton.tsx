@@ -1,8 +1,9 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { cancelMyReservation } from '@/app/actions';
+import { ConfirmModal } from '@/app/components/ConfirmModal';
 import styles from './my.module.scss';
 
 interface CancelButtonProps {
@@ -12,11 +13,15 @@ interface CancelButtonProps {
 
 export default function CancelButton({ reservationId, addToast }: CancelButtonProps) {
     const [isPending, startTransition] = useTransition();
+    const [showModal, setShowModal] = useState(false);
     const router = useRouter();
 
-    const handleCancel = () => {
-        if (!confirm('정말 예약을 취소하시겠습니까?')) return;
+    const handleClick = () => {
+        setShowModal(true);
+    };
 
+    const handleConfirm = () => {
+        setShowModal(false);
         startTransition(async () => {
             try {
                 await cancelMyReservation(reservationId);
@@ -29,17 +34,31 @@ export default function CancelButton({ reservationId, addToast }: CancelButtonPr
     };
 
     return (
-        <button
-            onClick={handleCancel}
-            disabled={isPending}
-            className={styles.cancelButton}
-        >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-            {isPending ? '처리 중...' : '예약 취소'}
-        </button>
+        <>
+            <button
+                onClick={handleClick}
+                disabled={isPending}
+                className={styles.cancelButton}
+            >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                {isPending ? '처리 중...' : '예약 취소'}
+            </button>
+
+            <ConfirmModal
+                isOpen={showModal}
+                title="예약 취소"
+                message="정말 예약을 취소하시겠습니까?"
+                onConfirm={handleConfirm}
+                onCancel={() => setShowModal(false)}
+                confirmText="취소하기"
+                cancelText="돌아가기"
+                variant="danger"
+            />
+        </>
     );
 }
+
