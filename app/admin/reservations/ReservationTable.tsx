@@ -3,7 +3,7 @@
 import { Reservation } from '@/app/types'
 import { updateReservationStatus } from '../actions'
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import styles from '@/app/home.module.scss'
 import ShowMoreButton from '@/app/components/ShowMoreButton'
@@ -14,12 +14,14 @@ import { useConfirmModal } from '@/app/components/ConfirmModal'
 import Card from '@/app/components/Card'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [loadingAction, setLoadingAction] = useState<'confirmed' | 'cancelled' | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
-  const [filter, setFilter] = useState<FilterType>('all')
+  const [filter, setFilter] = useState<FilterType>((searchParams.get('status') as FilterType) || 'all')
   const [sort, setSort] = useState<SortType>('created-desc')
-  const router = useRouter()
   const { toasts, addToast } = useToast()
   const { confirm, ModalComponent } = useConfirmModal()
 

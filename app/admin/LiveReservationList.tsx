@@ -69,18 +69,18 @@ export default function LiveReservationList({
             {/* 통계 카드 */}
             {showStats && (
                 <div className={styles.statsGrid}>
-                    <div className={styles.statCard}>
+                    <Link href="/admin/reservations" className={styles.statCard}>
                         <span className={styles.statLabel}>총 예약</span>
                         <span className={styles.statValue}>{stats.total}</span>
-                    </div>
-                    <div className={styles.statCard} style={{ borderColor: '#f59e0b' }}>
+                    </Link>
+                    <Link href="/admin/reservations?status=pending" className={styles.statCard} style={{ borderColor: '#f59e0b' }}>
                         <span className={styles.statLabel}>대기 중</span>
                         <span className={styles.statValue} style={{ color: '#f59e0b' }}>{stats.pending}</span>
-                    </div>
-                    <div className={styles.statCard} style={{ borderColor: '#10b981' }}>
+                    </Link>
+                    <Link href="/admin/reservations?status=confirmed" className={styles.statCard} style={{ borderColor: '#10b981' }}>
                         <span className={styles.statLabel}>확정됨</span>
                         <span className={styles.statValue} style={{ color: '#10b981' }}>{stats.confirmed}</span>
-                    </div>
+                    </Link>
                 </div>
             )}
 
