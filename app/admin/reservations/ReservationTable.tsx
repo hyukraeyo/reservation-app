@@ -26,14 +26,19 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       const result = await updateReservationStatus(id, status)
       if (result.success) {
         addToast(status === 'confirmed' ? '예약이 승인되었습니다' : '예약이 취소되었습니다', 'success')
+        // 성공 시 로딩 상태 유지 - 새 데이터가 렌더링되면 해당 카드가 사라짐
         router.refresh()
       } else {
         addToast('처리 중 오류가 발생했습니다', 'error')
+        // 에러 시에만 상태 리셋
+        setLoadingId(null)
+        setLoadingAction(null)
+        isProcessing.current = false
       }
     } catch (err) {
       console.error(err)
       addToast('처리 중 오류가 발생했습니다', 'error')
-    } finally {
+      // 에러 시에만 상태 리셋
       setLoadingId(null)
       setLoadingAction(null)
       isProcessing.current = false
