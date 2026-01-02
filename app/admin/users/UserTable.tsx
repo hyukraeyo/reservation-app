@@ -35,20 +35,26 @@ function RoleSelector({
   return (
     <div className={styles.roleBadgeContainer}>
       <button
-        className={`${styles.roleBadge} ${styles[`role_${role}`]} ${isLoading ? styles.loading : ''}`}
+        className={`${styles.roleBadge} ${styles[`role_${role}`]}`}
         onClick={(e) => {
-          e.stopPropagation() // 이벤트 전파 방지
+          e.stopPropagation()
           if (!isLoading) onToggle()
         }}
         disabled={isLoading}
         title="권한 변경"
       >
-        {roleLabels[role]}
+        {isLoading ? (
+          <svg className={styles.spinner} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle className={styles.spinnerTrack} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className={styles.spinnerPath} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        ) : (
+          roleLabels[role]
+        )}
       </button>
 
       {isOpen && (
         <>
-          {/* 투명 백드롭: 외부 클릭 시 닫기용 */}
           <div
             style={{ position: 'fixed', inset: 0, zIndex: 40 }}
             onClick={(e) => {
@@ -64,7 +70,7 @@ function RoleSelector({
                 onClick={(e) => {
                   e.stopPropagation()
                   onRoleChange(key)
-                  onToggle() // 닫기
+                  onToggle()
                 }}
               >
                 {label}
@@ -161,7 +167,6 @@ export default function UserTable({ users }: { users: Profile[] }) {
   const router = useRouter()
   const { confirm, ModalComponent } = useConfirmModal()
 
-  // 스크롤 시 드롭다운 닫기
   useEffect(() => {
     const handleScroll = () => {
       if (openSelectorId) setOpenSelectorId(null)
@@ -286,10 +291,6 @@ export default function UserTable({ users }: { users: Profile[] }) {
               <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</span>
             </div>
           </div>
-
-          {loadingId === user.id && (
-            <div className={styles.loadingText}>설정 저장 중...</div>
-          )}
 
           {/* Memo */}
           <UserMemo userId={user.id} initialMemo={user.memo} addToast={addToast} />

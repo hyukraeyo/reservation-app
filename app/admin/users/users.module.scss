@@ -261,6 +261,7 @@
   border: 1px solid transparent;
   transition: all 0.2s;
   white-space: nowrap;
+  min-width: 50px; /* 로딩 스피너 너비 확보 */
   
   &.role_user { 
     background-color: #f3f4f6; 
@@ -285,7 +286,7 @@
   }
 
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.8;
     cursor: wait;
   }
 }
@@ -332,4 +333,19 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+// SVG Spinner
+.spinner {
+  width: 14px;
+  height: 14px;
+  animation: spin 1s linear infinite;
+  display: block;
+}
+.spinnerTrack { opacity: 0.3; }
+.spinnerPath { opacity: 0.75; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
