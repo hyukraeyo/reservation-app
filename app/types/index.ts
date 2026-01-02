@@ -9,6 +9,8 @@ export interface Profile {
   age_range?: string | null;
   birthday?: string | null;
   birthyear?: string | null;
+  memo?: string | null;
+  created_at?: string | null;
 }
 
 export interface Reservation {
