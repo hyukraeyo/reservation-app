@@ -60,6 +60,18 @@ export async function GET(request: NextRequest) {
           })
         }
 
+        // Check for missing required profile info (name, phone)
+        // If missing, redirect to completion page
+        const { data: currentProfile } = await supabase
+          .from('profiles')
+          .select('name, phone')
+          .eq('id', user.id)
+          .single();
+
+        if (currentProfile && (!currentProfile.name || !currentProfile.phone)) {
+          return NextResponse.redirect(`${origin}/complete-profile`);
+        }
+
         // Check for user role to determine redirect
         let finalRedirect = next;
         try {
