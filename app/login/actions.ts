@@ -19,6 +19,8 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
+  const { data: { user } } = await supabase.auth.getUser()
+
   if (user) {
     // Check user profile status
     const { data: profile } = await supabase
