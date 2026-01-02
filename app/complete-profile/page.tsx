@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import styles from './complete-profile.module.scss'
 import LoadingSpinner from '@/app/components/LoadingSpinner'
+import { updateUserProfile } from './actions'
 
 export default function CompleteProfilePage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [userId, setUserId] = useState<string | null>(null)
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -29,7 +29,6 @@ export default function CompleteProfilePage() {
                 router.replace('/login')
                 return
             }
-            setUserId(user.id)
 
             const { data: profile } = await supabase
                 .from('profiles')
@@ -79,34 +78,19 @@ export default function CompleteProfilePage() {
         setSaving(true)
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) {
-                throw new Error('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.')
+            const result = await updateUserProfile(formData)
+
+            if (result.error) {
+                alert('저장 중 오류가 발생했습니다: ' + result.error)
+                setSaving(false)
+            } else {
+                router.refresh()
+                router.replace('/')
             }
-
-            const updates: any = {
-                updated_at: new Date().toISOString()
-            }
-
-            // 입력된 값이 있다면 업데이트에 포함
-            if (formData.name && formData.name.trim()) updates.name = formData.name
-            if (formData.phone && formData.phone.trim()) updates.phone = formData.phone
-
-            const { error } = await supabase
-                .from('profiles')
-                .update(updates)
-                .eq('id', user.id)
-
-            if (error) {
-                throw error
-            }
-
-            router.refresh()
-            router.replace('/')
 
         } catch (error: any) {
             console.error('Profile update error:', error)
-            alert('저장 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'))
+            alert('저장 중 알 수 없는 오류가 발생했습니다.')
             setSaving(false)
         }
     }
