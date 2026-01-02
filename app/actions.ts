@@ -233,9 +233,19 @@ export async function getMyReservations() {
     throw new Error('인증되지 않은 사용자입니다.');
   }
 
+  const now = new Date().toISOString();
+
+  // Auto-cancel user's expired pending reservations
+  await supabase
+    .from('reservations')
+    .update({ status: 'cancelled' })
+    .eq('user_id', user.id)
+    .eq('status', 'pending')
+    .lt('time', now);
+
   const { data, error } = await supabase
     .from('reservations')
-    .select('*')
+    .select('*, created_at')
     .eq('user_id', user.id)
     .order('time', { ascending: false });
 
