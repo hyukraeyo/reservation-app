@@ -31,8 +31,14 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
 
     const isAdminPage = pathname?.startsWith('/admin');
 
-    // 로고 클릭 핸들러
-    const handleLogoClick = useCallback((e: React.MouseEvent) => {
+    // 일반 로고 클릭: 홈으로 이동
+    const handleHomeClick = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        router.push('/');
+    }, [router]);
+
+    // 히든 영역 클릭: 로그아웃 버튼 토글
+    const handleSecretClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
 
         // 타임아웃 리셋
@@ -96,15 +102,28 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
     return (
         <header className={`${styles.header} ${!showHeader ? styles.hidden : ''}`}>
             {ModalComponent}
-            {/* 왼쪽: 로고 (5회 클릭 시 로그아웃 토글) */}
+            {/* 왼쪽: 로고 및 히든 버튼 */}
             <div className={styles.left}>
                 <button
-                    onClick={handleLogoClick}
+                    onClick={handleHomeClick}
                     className={styles.logoButton}
                     title="홈으로"
                 >
                     <span className={styles.logoText}>{APP_NAME}</span>
                 </button>
+
+                {/* 히든 버튼 (로고 오른쪽) */}
+                <div
+                    onClick={handleSecretClick}
+                    style={{
+                        width: '24px',
+                        height: '24px',
+                        opacity: 0,
+                        cursor: 'default',
+                        flexShrink: 0
+                    }}
+                    title=""
+                />
 
                 {/* 숨겨진 로그아웃 버튼 */}
                 {showLogout && (
