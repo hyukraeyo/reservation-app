@@ -1,0 +1,40 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  
+  &::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+  
+  &.confirmed {
+    color: var(--primary-color);
+  }
+  
+  &.pending {
+    color: var(--warning-text, #f59e0b);
+  }
+  
+  &.cancelled {
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+  
+  &.compact {
+    font-size: 0.75rem;
+    
+    &::before {
+      width: 5px;
+      height: 5px;
+    }
+  }
+}

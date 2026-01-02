@@ -2,22 +2,48 @@
 
 import { Reservation } from '@/app/types'
 import { updateReservationStatus } from '../actions'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 import styles from '@/app/home.module.scss'
 import ShowMoreButton from '@/app/components/ShowMoreButton'
 import { ToastContainer, useToast } from '@/app/components/Toast'
+import StatusBadge from '@/app/components/StatusBadge'
+import { formatReservationDate, FILTER_OPTIONS, SORT_OPTIONS, FilterType, SortType } from '@/utils/reservation'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [loadingAction, setLoadingAction] = useState<'confirmed' | 'cancelled' | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
+  const [filter, setFilter] = useState<FilterType>('all')
+  const [sort, setSort] = useState<SortType>('time-asc')
   const router = useRouter()
   const { toasts, addToast } = useToast()
 
+  // Filter and sort reservations
+  const filteredReservations = useMemo(() => {
+    let result = [...reservations];
+
+    if (filter !== 'all') {
+      result = result.filter(r => r.status === filter);
+    }
+
+    result.sort((a, b) => {
+      if (sort === 'time-asc') {
+        return new Date(a.time).getTime() - new Date(b.time).getTime();
+      } else if (sort === 'time-desc') {
+        return new Date(b.time).getTime() - new Date(a.time).getTime();
+      } else {
+        const aCreated = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bCreated = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return bCreated - aCreated;
+      }
+    });
+
+    return result;
+  }, [reservations, filter, sort]);
+
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
-    // 같은 항목이 이미 처리 중이면 무시
     if (loadingId === id) return
 
     setLoadingId(id)
@@ -26,7 +52,6 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       const result = await updateReservationStatus(id, status)
       if (result.success) {
         addToast(status === 'confirmed' ? '예약이 승인되었습니다' : '예약이 취소되었습니다', 'success')
-        // 성공 시 로딩 상태 유지 - 새 데이터가 렌더링되면 해당 카드가 사라짐
         router.refresh()
       } else {
         addToast('처리 중 오류가 발생했습니다', 'error')
@@ -41,79 +66,100 @@ export default function ReservationTable({ reservations }: { reservations: Reser
     }
   }
 
-  if (!reservations || reservations.length === 0) {
-    return <div style={{ color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>예약 내역이 없습니다.</div>
-  }
-
-  const visibleReservations = reservations.slice(0, displayCount)
-  const hasMore = reservations.length > displayCount
+  const visibleReservations = filteredReservations.slice(0, displayCount)
+  const hasMore = filteredReservations.length > displayCount
 
   return (
     <>
       <ToastContainer toasts={toasts} />
-      <div className={styles.tableWrapper}>
 
-        {/* Mobile Card View */}
-        <div className={styles.cardList}>
-          {visibleReservations.map(res => {
-            const dateObj = new Date(res.time);
-            const dateStr = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
-            const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
-            const displayName = res.profiles?.full_name || res.profiles?.email || '알 수 없는 사용자';
-            const isThisLoading = loadingId === res.id;
-
-            return (
-              <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
-                <div className={styles.resHeader}>
-                  <div className={styles.resInfo}>
-                    <div className={styles.resDate}>{dateStr}</div>
-                    <div className={styles.resTime}>{timeStr}</div>
-                    <div className={styles.resEmail}>{displayName}</div>
-                  </div>
-                  <div>
-                    <span className={`${styles.resBadge} ${styles[res.status]}`}>
-                      {res.status === 'confirmed' ? '확정' : res.status === 'cancelled' ? '취소' : '대기'}
-                    </span>
-                  </div>
-                </div>
-
-                {res.status === 'pending' && (
-                  <div className={styles.resActions}>
-                    <button
-                      onClick={() => handleStatusChange(res.id, 'cancelled')}
-                      disabled={isThisLoading}
-                      className={styles.btnCancel}
-                    >
-                      {isThisLoading && loadingAction === 'cancelled'
-                        ? <div className="spinner" style={{ width: '1rem', height: '1rem', borderTopColor: 'var(--text-secondary)' }}></div>
-                        : '취소'}
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(res.id, 'confirmed')}
-                      disabled={isThisLoading}
-                      className={styles.btnApprove}
-                    >
-                      {isThisLoading && loadingAction === 'confirmed'
-                        ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div>
-                        : '승인'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+      {/* Filter & Sort Controls */}
+      {reservations.length > 0 && (
+        <div className={styles.filterSection}>
+          <div className={styles.filterChips}>
+            {FILTER_OPTIONS.map(option => (
+              <button
+                key={option.value}
+                className={`${styles.filterChip} ${filter === option.value ? styles.active : ''}`}
+                onClick={() => { setFilter(option.value); setDisplayCount(5); }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <select
+            className={styles.sortSelect}
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortType)}
+          >
+            {SORT_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
+      )}
+
+      <div className={styles.tableWrapper}>
+        {filteredReservations.length === 0 ? (
+          <div style={{ color: 'var(--text-secondary)', padding: '2rem', textAlign: 'center' }}>
+            {filter !== 'all' ? '해당 조건의 예약이 없습니다.' : '예약 내역이 없습니다.'}
+          </div>
+        ) : (
+          <div className={styles.cardList}>
+            {visibleReservations.map(res => {
+              const { fullDate, time } = formatReservationDate(res.time);
+              const displayName = res.profiles?.full_name || res.profiles?.email || '알 수 없는 사용자';
+              const isThisLoading = loadingId === res.id;
+
+              return (
+                <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
+                  <div className={styles.resHeader}>
+                    <div className={styles.resInfo}>
+                      <div className={styles.resDate}>{fullDate}</div>
+                      <div className={styles.resTime}>{time}</div>
+                      <div className={styles.resEmail}>{displayName}</div>
+                    </div>
+                    <StatusBadge status={res.status} />
+                  </div>
+
+                  {res.status === 'pending' && (
+                    <div className={styles.resActions}>
+                      <button
+                        onClick={() => handleStatusChange(res.id, 'cancelled')}
+                        disabled={isThisLoading}
+                        className={styles.btnCancel}
+                      >
+                        {isThisLoading && loadingAction === 'cancelled'
+                          ? <div className="spinner" style={{ width: '1rem', height: '1rem', borderTopColor: 'var(--text-secondary)' }}></div>
+                          : '취소'}
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(res.id, 'confirmed')}
+                        disabled={isThisLoading}
+                        className={styles.btnApprove}
+                      >
+                        {isThisLoading && loadingAction === 'confirmed'
+                          ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div>
+                          : '승인'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {hasMore && (
           <ShowMoreButton
             onClick={() => setDisplayCount(prev => prev + 5)}
-            remainingCount={reservations.length - displayCount}
+            remainingCount={filteredReservations.length - displayCount}
           />
         )}
-
       </div>
     </>
   )
 }
+
 
 

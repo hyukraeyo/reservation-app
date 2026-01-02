@@ -5,6 +5,15 @@ import styles from './my.module.scss';
 import CancelButton from './CancelButton';
 import { ToastContainer, useToast } from '@/app/components/Toast';
 import ShowMoreButton from '@/app/components/ShowMoreButton';
+import StatusBadge from '@/app/components/StatusBadge';
+import {
+    formatReservationDate,
+    canCancelReservation,
+    FILTER_OPTIONS,
+    SORT_OPTIONS,
+    FilterType,
+    SortType
+} from '@/utils/reservation';
 
 interface Reservation {
     id: string;
@@ -17,25 +26,8 @@ interface MyReservationsListProps {
     initialReservations: Reservation[];
 }
 
-type FilterType = 'all' | 'pending' | 'confirmed' | 'cancelled';
-type SortType = 'time-asc' | 'time-desc' | 'created-desc';
-
-const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
-    { value: 'all', label: '전체' },
-    { value: 'pending', label: '대기중' },
-    { value: 'confirmed', label: '확정' },
-    { value: 'cancelled', label: '취소' },
-];
-
-const SORT_OPTIONS: { value: SortType; label: string }[] = [
-    { value: 'time-asc', label: '예약일 가까운순' },
-    { value: 'time-desc', label: '예약일 먼순' },
-    { value: 'created-desc', label: '최근 신청순' },
-];
-
 export default function MyReservationsList({ initialReservations }: MyReservationsListProps) {
     const { toasts, addToast } = useToast();
-    const now = new Date();
     const [displayCount, setDisplayCount] = useState(5);
     const [filter, setFilter] = useState<FilterType>('all');
     const [sort, setSort] = useState<SortType>('time-asc');
@@ -114,17 +106,9 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                 ) : (
                     <div className={styles.listContainer}>
                         {visibleReservations.map((reservation) => {
-                            const reservationDate = new Date(reservation.time);
-                            const isPast = reservationDate < now;
-                            const canCancel = reservation.status !== 'cancelled' && reservation.status !== 'confirmed' && !isPast;
+                            const { month, day, weekday, time } = formatReservationDate(reservation.time);
+                            const canCancel = canCancelReservation(reservation.status, reservation.time);
                             const isCancelled = reservation.status === 'cancelled';
-                            const isConfirmed = reservation.status === 'confirmed';
-
-                            // Date formatting parts
-                            const month = reservationDate.toLocaleString('en-US', { month: 'short' });
-                            const day = reservationDate.getDate();
-                            const weekday = reservationDate.toLocaleString('ko-KR', { weekday: 'short' });
-                            const timeStr = reservationDate.toLocaleString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 
                             return (
                                 <div key={reservation.id} className={`${styles.reservationCard} ${isCancelled ? styles.cancelled : ''}`}>
@@ -142,13 +126,11 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <polyline points="12 6 12 12 16 14"></polyline>
                                             </svg>
-                                            <span className={styles.time}>{timeStr}</span>
+                                            <span className={styles.time}>{time}</span>
                                         </div>
 
                                         <div className={styles.statusWrapper}>
-                                            <span className={`${styles.statusBadge} ${isConfirmed ? styles.confirmed : isCancelled ? styles.cancelled : styles.pending}`}>
-                                                {isConfirmed ? '예약 확정' : isCancelled ? '취소됨' : '대기 중'}
-                                            </span>
+                                            <StatusBadge status={reservation.status} />
                                         </div>
                                     </div>
 
