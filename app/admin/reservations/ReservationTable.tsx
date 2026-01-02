@@ -11,15 +11,17 @@ import { ToastContainer, useToast } from '@/app/components/Toast'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [loadingAction, setLoadingAction] = useState<'confirmed' | 'cancelled' | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
   const isProcessing = useRef(false)
   const router = useRouter()
   const { toasts, addToast } = useToast()
 
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
-    if (isProcessing.current || loadingId) return
+    if (isProcessing.current) return
     isProcessing.current = true
     setLoadingId(id)
+    setLoadingAction(status)
     try {
       const result = await updateReservationStatus(id, status)
       if (result.success) {
@@ -33,6 +35,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
       addToast('처리 중 오류가 발생했습니다', 'error')
     } finally {
       setLoadingId(null)
+      setLoadingAction(null)
       isProcessing.current = false
     }
   }
@@ -56,6 +59,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
             const dateStr = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
             const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
             const displayName = res.profiles?.full_name || res.profiles?.email || '알 수 없는 사용자';
+            const isThisLoading = loadingId === res.id;
 
             return (
               <div key={res.id} className={`${styles.resCard} ${styles[`status-${res.status}`]}`}>
@@ -76,17 +80,21 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                   <div className={styles.resActions}>
                     <button
                       onClick={() => handleStatusChange(res.id, 'cancelled')}
-                      disabled={!!loadingId}
+                      disabled={isThisLoading}
                       className={styles.btnCancel}
                     >
-                      {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem', borderTopColor: 'var(--text-secondary)' }}></div> : '취소'}
+                      {isThisLoading && loadingAction === 'cancelled'
+                        ? <div className="spinner" style={{ width: '1rem', height: '1rem', borderTopColor: 'var(--text-secondary)' }}></div>
+                        : '취소'}
                     </button>
                     <button
                       onClick={() => handleStatusChange(res.id, 'confirmed')}
-                      disabled={!!loadingId}
+                      disabled={isThisLoading}
                       className={styles.btnApprove}
                     >
-                      {loadingId === res.id ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div> : '승인'}
+                      {isThisLoading && loadingAction === 'confirmed'
+                        ? <div className="spinner" style={{ width: '1rem', height: '1rem' }}></div>
+                        : '승인'}
                     </button>
                   </div>
                 )}
@@ -106,4 +114,5 @@ export default function ReservationTable({ reservations }: { reservations: Reser
     </>
   )
 }
+
 
