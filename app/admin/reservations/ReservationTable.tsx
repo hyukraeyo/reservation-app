@@ -16,7 +16,7 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   const [loadingAction, setLoadingAction] = useState<'confirmed' | 'cancelled' | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
   const [filter, setFilter] = useState<FilterType>('all')
-  const [sort, setSort] = useState<SortType>('time-asc')
+  const [sort, setSort] = useState<SortType>('created-desc')
   const router = useRouter()
   const { toasts, addToast } = useToast()
 

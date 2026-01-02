@@ -30,7 +30,7 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
     const { toasts, addToast } = useToast();
     const [displayCount, setDisplayCount] = useState(5);
     const [filter, setFilter] = useState<FilterType>('all');
-    const [sort, setSort] = useState<SortType>('time-asc');
+    const [sort, setSort] = useState<SortType>('created-desc');
 
     // Filter and sort reservations
     const filteredReservations = useMemo(() => {
