@@ -154,16 +154,15 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
                         </Link>
                     </>
                 ) : (
-                    <>
-                        <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
-                            <IconCalendar />
-                        </Link>
-                        {isAdmin && (
-                            <Link href="/admin" className={styles.iconLinkFilled} title="관리자 페이지" aria-label="관리자 페이지">
-                                <IconAdmin />
-                            </Link>
-                        )}
-                    </>
+                    <Link href="/my" className={styles.iconLink} title="내 예약" aria-label="내 예약">
+                        <IconCalendar />
+                    </Link>
+                )}
+
+                {isAdmin && (
+                    <Link href="/admin" className={styles.iconLinkFilled} title="관리자 페이지" aria-label="관리자 페이지">
+                        <IconAdmin />
+                    </Link>
                 )}
             </nav>
         </header>
