@@ -1,0 +1,157 @@
+.filterSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 5;
+}
+
+.filterChips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    // Add padding to prevent shadow clipping
+    padding: 0.25rem 0.5rem 0.75rem 0.25rem;
+    margin-left: -0.25rem;
+    
+    // Hide scrollbar
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.filterChip {
+    padding: 0.6rem 1.1rem;
+    border-radius: 20px;
+    border: 1px solid transparent; 
+    background: transparent;
+    color: var(--text-secondary, #666); 
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+
+    &:hover {
+        background: var(--bg-hover, #f5f5f5);
+        color: var(--text-main, #333);
+    }
+
+    &.active {
+        background: var(--text-main, #1a1a1a); 
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+}
+
+.sortSelectOrAction {
+    z-index: 10;
+}
+
+.sortTrigger {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    background: white;
+    border: 1px solid var(--border-color, #eee);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main, #333);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--bg-hover, #f5f5f5);
+        border-color: var(--primary-color, #22c55e);
+    }
+}
+
+.sortIcon {
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary, #666);
+}
+
+@media (max-width: 640px) {
+    .filterSection {
+        display: flex; /* Ensure display flex is active */
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        width: 100%; /* Force full width */
+        justify-content: space-between; /* Distribute space */
+    }
+
+    .filterChips {
+        flex: 1;
+        width: 0;
+        padding-bottom: 0;
+        padding-right: 1.5rem;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        border-right: none;
+        
+        /* Ensure chips don't wrap inside */
+        flex-wrap: nowrap; 
+    }
+
+    .filterChip {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.85rem;
+        background: var(--bg-card, #fff);
+        border: 1px solid var(--border-color, #eee);
+        flex-shrink: 0;
+        
+        &.active {
+            border-color: transparent;
+            background: var(--text-main, #1a1a1a);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    }
+
+    /* Mobile specific sort styles */
+    .sortSelectOrAction {
+        flex-shrink: 0;
+        width: auto !important; /* Override default width */
+        min-width: auto !important; /* Override default min-width */
+        margin-top: 0;
+        margin-left: auto; /* Push to the right */
+    }
+
+    .sortTrigger {
+        padding: 0.5rem;
+        border: none;
+        background: transparent;
+        font-size: 0; /* Hide text */
+        gap: 0;
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+        border-radius: 50%;
+
+        &:hover {
+            background: var(--bg-hover, #f5f5f5);
+        }
+        
+        span {
+            display: none;
+        }
+    }
+    
+    .sortIcon {
+        width: 20px;
+        height: 20px;
+        color: var(--text-main, #333);
+    }
+}

@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
                 }
             }
 
-            // 6. 프로필 테이블 동기화 (선택사항, trigger가 없다면 필요)
+            // 6. 프로필 테이블 동기화 및 필수 정보 확인
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
                 await supabase.from('profiles').upsert({
@@ -155,6 +155,24 @@ export async function GET(request: NextRequest) {
                     phone: naverUser.mobile || naverUser.mobile_e164,
                     avatar_url: naverUser.profile_image
                 })
+
+                // 프로필 정보 확인 (이름, 전화번호 누락 시 입력 페이지로 이동)
+                const { data: currentProfile } = await supabase
+                    .from('profiles')
+                    .select('name, phone, role')
+                    .eq('id', user.id)
+                    .single()
+
+                if (currentProfile) {
+                    if (!currentProfile.name || !currentProfile.phone) {
+                        return NextResponse.redirect(`${origin}/complete-profile`)
+                    }
+
+                    // 관리자/사장님 리다이렉트 처리
+                    if (currentProfile.role === 'admin' || currentProfile.role === 'owner') {
+                        return NextResponse.redirect(`${origin}/admin`)
+                    }
+                }
             }
 
             return NextResponse.redirect(`${origin}/`)

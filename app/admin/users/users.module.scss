@@ -297,7 +297,7 @@
   cursor: pointer;
   font-size: 1rem;
   padding: 0.2rem 0.5rem;
-  margin-left: 0.5rem;
+  margin-left: auto; // Move to the right
   border-radius: 6px;
   transition: all 0.2s;
   

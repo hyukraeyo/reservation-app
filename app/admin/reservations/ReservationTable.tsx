@@ -12,6 +12,7 @@ import StatusBadge from '@/app/components/StatusBadge'
 import { formatReservationDate, FILTER_OPTIONS, SORT_OPTIONS, FilterType, SortType } from '@/utils/reservation'
 import { useConfirmModal } from '@/app/components/ConfirmModal'
 import Card from '@/app/components/Card'
+import FilterSortBar from '@/app/components/FilterSortBar'
 
 export default function ReservationTable({ reservations }: { reservations: Reservation[] }) {
   const router = useRouter()
@@ -92,28 +93,15 @@ export default function ReservationTable({ reservations }: { reservations: Reser
 
       {/* Filter & Sort Controls */}
       {reservations.length > 0 && (
-        <div className={styles.filterSection}>
-          <div className={styles.filterChips}>
-            {FILTER_OPTIONS.map(option => (
-              <button
-                key={option.value}
-                className={`${styles.filterChip} ${filter === option.value ? styles.active : ''}`}
-                onClick={() => { setFilter(option.value); setDisplayCount(5); }}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-          <select
-            className={styles.sortSelect}
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortType)}
-          >
-            {SORT_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-        </div>
+        <FilterSortBar
+          filterOptions={FILTER_OPTIONS}
+          currentFilter={filter}
+          onFilterChange={(val) => { setFilter(val); setDisplayCount(5); }}
+          sortOptions={SORT_OPTIONS}
+          currentSort={sort}
+          onSortChange={(val) => setSort(val)}
+          className={styles.filterSection}
+        />
       )}
 
       <div className={styles.tableWrapper}>

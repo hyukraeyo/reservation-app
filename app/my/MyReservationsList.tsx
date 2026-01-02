@@ -6,7 +6,7 @@ import CancelButton from './CancelButton';
 import { ToastContainer, useToast } from '@/app/components/Toast';
 import ShowMoreButton from '@/app/components/ShowMoreButton';
 import StatusBadge from '@/app/components/StatusBadge';
-import Select from '@/app/components/Select';
+import FilterSortBar from '@/app/components/FilterSortBar';
 import {
     formatReservationDate,
     canCancelReservation,
@@ -16,7 +16,6 @@ import {
     SortType
 } from '@/utils/reservation';
 
-import { Profile } from '@/app/types';
 
 interface Reservation {
     id: string;
@@ -71,26 +70,14 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
 
             {/* Filter & Sort Controls */}
             {initialReservations.length > 0 && (
-                <div className={styles.filterSection}>
-                    <div className={styles.filterChips}>
-                        {FILTER_OPTIONS.map(option => (
-                            <button
-                                key={option.value}
-                                className={`${styles.filterChip} ${filter === option.value ? styles.active : ''}`}
-                                onClick={() => { setFilter(option.value); setDisplayCount(5); }}
-                            >
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                    <Select
-                        value={sort}
-                        onChange={(val) => setSort(val as SortType)}
-                        options={SORT_OPTIONS}
-                        className={styles.sortSelectContainer}
-                        align="right"
-                    />
-                </div>
+                <FilterSortBar
+                    filterOptions={FILTER_OPTIONS}
+                    currentFilter={filter}
+                    onFilterChange={(val) => { setFilter(val); setDisplayCount(5); }}
+                    sortOptions={SORT_OPTIONS}
+                    currentSort={sort}
+                    onSortChange={(val) => setSort(val)}
+                />
             )}
 
             <div className={styles.historyCard}>
@@ -133,6 +120,17 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
                                         <div className={styles.statusWrapper}>
                                             <StatusBadge status={reservation.status} />
                                         </div>
+                                        {reservation.created_at && (
+                                            <span className={styles.createdTime}>
+                                                신청: {new Date(reservation.created_at).toLocaleString('ko-KR', {
+                                                    month: 'numeric',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false
+                                                })}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* Right: Action */}
