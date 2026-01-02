@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { useState, useCallback, useEffect } from 'react';
 import styles from './ConfirmModal.module.scss';
 
 interface ConfirmModalProps {
@@ -24,9 +25,22 @@ export function ConfirmModal({
     cancelText = '취소',
     variant = 'default'
 }: ConfirmModalProps) {
-    if (!isOpen) return null;
+    const [mounted, setMounted] = useState(false);
 
-    return (
+    useEffect(() => {
+        setMounted(true);
+        // 모달이 열리면 body 스크롤 방지
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    if (!isOpen || !mounted) return null;
+
+    return createPortal(
         <div className={styles.overlay} onClick={onCancel}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <h3 className={styles.title}>{title}</h3>
@@ -43,7 +57,8 @@ export function ConfirmModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 
