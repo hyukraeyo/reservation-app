@@ -12,9 +12,7 @@ export async function updateUserProfile(formData: { name: string; phone: string 
         return { error: '사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.' }
     }
 
-    const updates: any = {
-        updated_at: new Date().toISOString(),
-    }
+    const updates: any = {}
 
     // 유효한 값만 업데이트 객체에 포함
     if (formData.name && formData.name.trim()) updates.name = formData.name
