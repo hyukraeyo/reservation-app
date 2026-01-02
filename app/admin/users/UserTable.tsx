@@ -1,7 +1,7 @@
 'use client'
 
 import { updateUserRole, updateUserMemo } from '../actions'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Profile } from '@/app/types'
 import styles from './users.module.scss'
@@ -14,14 +14,16 @@ import { useToast, ToastContainer } from '@/app/components/Toast'
 function RoleSelector({
   currentRole,
   onRoleChange,
-  isLoading
+  isLoading,
+  isOpen,
+  onToggle
 }: {
   currentRole: string | null,
   onRoleChange: (role: string) => void,
-  isLoading: boolean
+  isLoading: boolean,
+  isOpen: boolean,
+  onToggle: () => void
 }) {
-  const [isOpen, setIsOpen] = useState(false)
-
   const roleLabels: Record<string, string> = {
     user: '손님',
     owner: '사장님',
@@ -34,7 +36,10 @@ function RoleSelector({
     <div className={styles.roleBadgeContainer}>
       <button
         className={`${styles.roleBadge} ${styles[`role_${role}`]} ${isLoading ? styles.loading : ''}`}
-        onClick={() => !isLoading && setIsOpen(!isOpen)}
+        onClick={(e) => {
+          e.stopPropagation() // 이벤트 전파 방지
+          if (!isLoading) onToggle()
+        }}
         disabled={isLoading}
         title="권한 변경"
       >
@@ -43,18 +48,23 @@ function RoleSelector({
 
       {isOpen && (
         <>
+          {/* 투명 백드롭: 외부 클릭 시 닫기용 */}
           <div
             style={{ position: 'fixed', inset: 0, zIndex: 40 }}
-            onClick={() => setIsOpen(false)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
           />
           <div className={styles.roleDropdown}>
             {Object.entries(roleLabels).map(([key, label]) => (
               <button
                 key={key}
                 className={role === key ? styles.active : ''}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation()
                   onRoleChange(key)
-                  setIsOpen(false)
+                  onToggle() // 닫기
                 }}
               >
                 {label}
@@ -146,9 +156,19 @@ export default function UserTable({ users }: { users: Profile[] }) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
   const [searchTerm, setSearchTerm] = useState('')
+  const [openSelectorId, setOpenSelectorId] = useState<string | null>(null)
   const isProcessing = useRef(false)
   const router = useRouter()
   const { confirm, ModalComponent } = useConfirmModal()
+
+  // 스크롤 시 드롭다운 닫기
+  useEffect(() => {
+    const handleScroll = () => {
+      if (openSelectorId) setOpenSelectorId(null)
+    }
+    window.addEventListener('scroll', handleScroll, true)
+    return () => window.removeEventListener('scroll', handleScroll, true)
+  }, [openSelectorId])
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (isProcessing.current || loadingId) return
@@ -160,12 +180,13 @@ export default function UserTable({ users }: { users: Profile[] }) {
     })
 
     if (!isConfirmed) {
-      router.refresh()
+      setOpenSelectorId(null)
       return
     }
 
     isProcessing.current = true
     setLoadingId(userId)
+    setOpenSelectorId(null)
 
     try {
       const result = await updateUserRole(userId, newRole)
@@ -232,6 +253,8 @@ export default function UserTable({ users }: { users: Profile[] }) {
                   currentRole={user.role}
                   onRoleChange={(role) => handleRoleChange(user.id, role)}
                   isLoading={loadingId === user.id}
+                  isOpen={openSelectorId === user.id}
+                  onToggle={() => setOpenSelectorId(openSelectorId === user.id ? null : user.id)}
                 />
               </div>
               <div className={styles.userEmail}>{user.email}</div>
