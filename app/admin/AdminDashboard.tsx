@@ -26,24 +26,6 @@ export default function AdminDashboard({
       </Card>
 
       <div className={styles.mainGrid}>
-        {/* 메뉴 링크 섹션 */}
-        <Card title="빠른 메뉴">
-          <div className={styles.menuGrid}>
-            <Link href="/" className={styles.menuCard}>
-              <div className={styles.menuIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <div>
-                <h4>예약 홈</h4>
-                <p>메인 화면으로 이동</p>
-              </div>
-            </Link>
-          </div>
-        </Card>
-
         {/* 실시간 현황 섹션 */}
         <Card
           title="최근 예약 현황"
