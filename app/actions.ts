@@ -37,19 +37,26 @@ export async function saveSubscription(subscription: PushSubscription) {
 export async function getReservationsByDate(dateStr: string) {
   const supabase = await createClient();
 
-  // KST (UTC+9) 시간대 기준으로 하루의 시작과 끝 계산
-  // Vercel 서버가 UTC로 동작해도 한국 시간 기준으로 쿼리
+  // ISO 문자열에서 날짜 부분만 추출 (시간대 독립적)
+  // 입력: "2026-01-02T00:00:00.000Z" 또는 "2026-01-02T09:00:00+09:00" 등
   const targetDate = new Date(dateStr);
 
-  // 해당 날짜의 KST 기준 00:00:00 (= UTC 전날 15:00:00)
-  const year = targetDate.getFullYear();
-  const month = targetDate.getMonth();
-  const day = targetDate.getDate();
+  // 클라이언트가 선택한 날짜를 KST 기준으로 처리
+  // getUTCHours로 시간을 확인하여 KST 날짜 결정
+  // 만약 UTC 시간이 15:00 미만이면 KST 기준 같은 날짜
+  // 15:00 이상이면 KST 기준 다음 날짜
 
-  // KST 00:00:00 = UTC -9시간
-  const startKST = new Date(Date.UTC(year, month, day, -9, 0, 0, 0));
-  // KST 23:59:59 = UTC 다음날 -9시간 + 23:59:59
-  const endKST = new Date(Date.UTC(year, month, day, -9 + 23, 59, 59, 999));
+  // 더 간단한 방법: 전달받은 날짜에 KST offset을 적용하여 KST 날짜 추출
+  const KST_OFFSET = 9 * 60 * 60 * 1000; // 9시간
+  const kstDate = new Date(targetDate.getTime() + KST_OFFSET);
+  const year = kstDate.getUTCFullYear();
+  const month = kstDate.getUTCMonth();
+  const day = kstDate.getUTCDate();
+
+  // KST 기준 해당 날짜의 00:00:00 ~ 23:59:59를 UTC로 변환
+  // KST 00:00 = UTC 전날 15:00
+  const startKST = new Date(Date.UTC(year, month, day - 1, 15, 0, 0, 0));
+  const endKST = new Date(Date.UTC(year, month, day, 14, 59, 59, 999));
 
   const { data, error } = await supabase
     .from('reservations')
