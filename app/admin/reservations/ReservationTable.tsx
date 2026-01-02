@@ -2,7 +2,7 @@
 
 import { Reservation } from '@/app/types'
 import { updateReservationStatus } from '../actions'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import styles from '@/app/home.module.scss'
@@ -13,13 +13,13 @@ export default function ReservationTable({ reservations }: { reservations: Reser
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [loadingAction, setLoadingAction] = useState<'confirmed' | 'cancelled' | null>(null)
   const [displayCount, setDisplayCount] = useState(5)
-  const isProcessing = useRef(false)
   const router = useRouter()
   const { toasts, addToast } = useToast()
 
   const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
-    if (isProcessing.current) return
-    isProcessing.current = true
+    // 같은 항목이 이미 처리 중이면 무시
+    if (loadingId === id) return
+
     setLoadingId(id)
     setLoadingAction(status)
     try {
@@ -30,18 +30,14 @@ export default function ReservationTable({ reservations }: { reservations: Reser
         router.refresh()
       } else {
         addToast('처리 중 오류가 발생했습니다', 'error')
-        // 에러 시에만 상태 리셋
         setLoadingId(null)
         setLoadingAction(null)
-        isProcessing.current = false
       }
     } catch (err) {
       console.error(err)
       addToast('처리 중 오류가 발생했습니다', 'error')
-      // 에러 시에만 상태 리셋
       setLoadingId(null)
       setLoadingAction(null)
-      isProcessing.current = false
     }
   }
 
