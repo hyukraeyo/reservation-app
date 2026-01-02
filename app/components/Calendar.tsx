@@ -162,7 +162,7 @@ export default function Calendar({ onSelect, initialValue, reservedSlots = [], o
     });
 
     return slots;
-  }, [selectedDate, reservedTimeSet, blocksNeeded]);
+  }, [selectedDate, reservedTimeSet, blocksNeeded, duration]);
 
   // Re-check scroll whenever time slots change
   useEffect(() => {
