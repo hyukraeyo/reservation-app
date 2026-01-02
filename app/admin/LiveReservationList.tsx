@@ -93,6 +93,11 @@ export default function LiveReservationList({
                                 <div className={styles.liveInfo}>
                                     <p className={styles.liveTime}>{new Date(res.time).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                     <p className={styles.liveId}>{res.profiles?.full_name || res.profiles?.email?.split('@')[0] || '익명'}</p>
+                                    {res.created_at && (
+                                        <p className={styles.liveCreatedAt}>
+                                            신청: {new Date(res.created_at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+                                        </p>
+                                    )}
                                 </div>
                                 <span className={`${styles.statusBadge} ${styles[res.status]}`}>
                                     {res.status === 'confirmed' ? '확정' : res.status === 'cancelled' ? '취소' : '대기'}

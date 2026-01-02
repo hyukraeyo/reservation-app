@@ -126,6 +126,17 @@ export default function ReservationTable({ reservations }: { reservations: Reser
                       <div className={styles.resDate}>{fullDate}</div>
                       <div className={styles.resTime}>{time}</div>
                       <div className={styles.resEmail}>{displayName}</div>
+                      {res.created_at && (
+                        <div className={styles.resCreatedTime}>
+                          신청: {new Date(res.created_at).toLocaleString('ko-KR', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })}
+                        </div>
+                      )}
                     </div>
                     <StatusBadge status={res.status} />
                   </div>
