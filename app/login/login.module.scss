@@ -10,7 +10,7 @@
   overflow: hidden;
 
   @media (max-width: 480px) {
-    padding: 1rem; /* 모바일 컨테이너 패딩 축소 */
+    padding: 0.8rem; /* 모바일 컨테이너 패딩 최소화 */
   }
 
   :global(.dark) & {
@@ -55,7 +55,7 @@
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative; // 추가: loadingOverlay 위치 기준
+  position: relative;
 
   :global(.dark) & {
     background: rgba(31, 41, 55, 0.6);
@@ -63,31 +63,31 @@
   }
 
   @media (max-width: 480px) {
-    padding: 1.5rem; /* 모바일 카드 내부 패딩 축소 */
-    gap: 1.5rem;
-    border-radius: 20px; /* 모바일에서 둥글기 약간 축소 */
+    padding: 1.25rem; /* 모바일 카드 내부 패딩 축소 */
+    gap: 1.25rem;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 모바일에서 그림자 부드럽게 */
   }
 }
 
-// 추가된 Loading Overlay 스타일
 .loadingOverlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.85); // 라이트 모드 배경
+  background-color: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 20;
-  border-radius: 28px; // loginCard와 일치
+  border-radius: 28px;
   animation: fadeIn 0.3s ease;
 
   :global(.dark) & {
-    background-color: rgba(15, 23, 42, 0.85); // 다크 모드 배경
+    background-color: rgba(15, 23, 42, 0.85);
   }
 }
 
