@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
             const fakePassword = `naver_${naverUser.id}_secret_key_!@#`
 
             // 5. 유저 존재 여부 확인 (Admin API 사용)
-            const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+            const { data: { users: _users }, error: _listError } = await supabaseAdmin.auth.admin.listUsers()
             // *주의: listUsers는 기본 50명 등 제한이 있을 수 있으므로 실제 프로덕션에서는 getUserByEmail 등을 권장하지만
             // Supabase JS v2 admin에는 getUserByEmail이 없고 listUsers로 찾아야 함.
             // 더 정확하게는: signInWithPassword를 먼저 시도하고 실패하면 가입시키는 플로우가 효율적.
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
                 console.log('Naver: Existing user login failed, trying to create new user...', signInError.message)
 
                 // 가입 시도 (Admin 권한으로 email_confirm: true 설정)
-                const { data: createUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+                const { data: _createUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
                     email: email,
                     password: fakePassword,
                     email_confirm: true, // 핵심: 이메일 인증 자동 완료
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
                     console.log('User exists, attempting to update password...')
 
                     // 1. 유저 ID 찾기
-                    const { data: { users }, error: findError } = await supabaseAdmin.auth.admin.listUsers()
+                    const { data: { users }, error: _findError } = await supabaseAdmin.auth.admin.listUsers()
                     const existingUser = users?.find(u => u.email === email)
 
                     if (existingUser) {

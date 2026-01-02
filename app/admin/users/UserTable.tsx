@@ -1,7 +1,7 @@
 'use client'
 
 import { updateUserRole, updateUserMemo } from '../actions'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Profile } from '@/app/types'
 import styles from './users.module.scss'
@@ -96,7 +96,6 @@ function UserMemo({ userId, initialMemo, addToast }: {
 
 
 function DeleteUserButton({ userId, userName, onDelete }: { userId: string, userName: string | null, onDelete: (id: string) => void }) {
-  const [isDeleting, setIsDeleting] = useState(false);
   const { confirm, ModalComponent } = useConfirmModal();
 
   const handleClick = async () => {
@@ -118,7 +117,6 @@ function DeleteUserButton({ userId, userName, onDelete }: { userId: string, user
         className={styles.deleteButton}
         onClick={handleClick}
         title="사용자 삭제"
-        disabled={isDeleting}
       >
         🗑️
       </button>
