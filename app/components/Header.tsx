@@ -138,9 +138,11 @@ export default function Header({ isAdmin, isSuperAdmin }: HeaderProps) {
 
             {/* 오른쪽: 네비게이션 */}
             <nav className={styles.nav}>
-                <Link href="/notifications" className={styles.iconLink} title="알림함" aria-label="알림함">
-                    <IconBell />
-                </Link>
+                {!isAdminPage && (
+                    <Link href="/notifications" className={styles.iconLink} title="알림함" aria-label="알림함">
+                        <IconBell />
+                    </Link>
+                )}
 
                 {isAdminPage ? (
                     <>
