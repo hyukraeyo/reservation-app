@@ -76,25 +76,38 @@ export default function CompleteProfilePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!userId) return
         setSaving(true)
 
-        const updates: any = {}
-        if (needsUpdate.name) updates.name = formData.name
-        if (needsUpdate.phone) updates.phone = formData.phone
-        updates.updated_at = new Date().toISOString()
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                throw new Error('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.')
+            }
 
-        const { error } = await supabase
-            .from('profiles')
-            .update(updates)
-            .eq('id', userId)
+            const updates: any = {
+                updated_at: new Date().toISOString()
+            }
 
-        if (error) {
-            alert('저장 중 오류가 발생했습니다: ' + error.message)
-            setSaving(false)
-        } else {
+            // 입력된 값이 있다면 업데이트에 포함
+            if (formData.name && formData.name.trim()) updates.name = formData.name
+            if (formData.phone && formData.phone.trim()) updates.phone = formData.phone
+
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', user.id)
+
+            if (error) {
+                throw error
+            }
+
             router.refresh()
             router.replace('/')
+
+        } catch (error: any) {
+            console.error('Profile update error:', error)
+            alert('저장 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류'))
+            setSaving(false)
         }
     }
 
