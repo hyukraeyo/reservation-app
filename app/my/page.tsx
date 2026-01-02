@@ -13,7 +13,13 @@ export default async function MyPage() {
 
     const reservations = await getMyReservations();
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
     return (
-        <MyReservationsList initialReservations={reservations} />
+        <MyReservationsList initialReservations={reservations} profile={profile} />
     );
 }

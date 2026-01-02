@@ -158,6 +158,39 @@ function UserMemo({ userId, initialMemo, addToast }: {
   )
 }
 
+
+
+function DeleteUserButton({ userId, userName, onDelete }: { userId: string, userName: string | null, onDelete: (id: string) => void }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { confirm, ModalComponent } = useConfirmModal();
+
+  const handleClick = async () => {
+    const isConfirmed = await confirm({
+      title: '사용자 삭제',
+      message: `${userName || '이 사용자'}를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+      variant: 'danger'
+    });
+
+    if (isConfirmed) {
+      onDelete(userId);
+    }
+  };
+
+  return (
+    <>
+      {ModalComponent}
+      <button
+        className={styles.deleteButton}
+        onClick={handleClick}
+        title="사용자 삭제"
+        disabled={isDeleting}
+      >
+        🗑️
+      </button>
+    </>
+  )
+}
+
 export default function UserTable({ users }: { users: Profile[] }) {
   const { toasts, addToast } = useToast()
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -207,6 +240,28 @@ export default function UserTable({ users }: { users: Profile[] }) {
       addToast('상태 변경 중 오류가 발생했습니다.', 'error')
     } finally {
       setLoadingId(null)
+      isProcessing.current = false
+    }
+  }
+
+  const handleDeleteUser = async (userId: string) => {
+    if (isProcessing.current) return
+    isProcessing.current = true
+
+    try {
+      const { deleteUser } = await import('../actions'); // Dynamically import to avoid circular dependency issues if any, or just ensure it's imported at top
+      const result = await deleteUser(userId);
+
+      if (result?.error) {
+        addToast('삭제 실패: ' + result.error, 'error')
+      } else {
+        router.refresh()
+        addToast('사용자가 삭제되었습니다.', 'success')
+      }
+    } catch (e: unknown) {
+      console.error(e)
+      addToast('삭제 중 오류가 발생했습니다.', 'error')
+    } finally {
       isProcessing.current = false
     }
   }
@@ -262,6 +317,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
                   isOpen={openSelectorId === user.id}
                   onToggle={() => setOpenSelectorId(openSelectorId === user.id ? null : user.id)}
                 />
+                <DeleteUserButton userId={user.id} userName={user.name || null} onDelete={handleDeleteUser} />
               </div>
               <div className={styles.userEmail}>{user.email}</div>
             </div>

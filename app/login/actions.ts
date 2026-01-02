@@ -118,6 +118,22 @@ export async function signInWithKakao() {
   }
 }
 
+export async function signInWithNaver() {
+  const state = Math.random().toString(36).substring(7);
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const redirectUri = encodeURIComponent(`${baseUrl}/auth/naver-callback`);
+
+  if (!clientId) {
+    console.error('Naver Client ID is missing');
+    return { error: '네이버 로그인 설정이 완료되지 않았습니다.' };
+  }
+
+  const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+
+  return { url: naverAuthUrl };
+}
+
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()

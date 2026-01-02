@@ -1,326 +1,300 @@
-// Filter & Sort Section
+
+.profileCard {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: 100px;
+}
+
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profileAvatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 24px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profileAvatarPlaceholder {
+    width: 70px;
+    height: 70px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.profileInfo {
+    flex: 1;
+}
+
+.profileName {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profileRole {
+    font-size: 0.75rem;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    font-weight: 600;
+}
+
+.profileEmail, .profilePhone {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+// ... existing styles ...
+
+.container {
+    padding: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+}
+
 .filterSection {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 100px 0 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .filterChips {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+    
+    // Hide scrollbar
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .filterChip {
-  padding: 0.5rem 1rem;
-  border-radius: 100px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-  }
+    &:hover {
+        background: var(--bg-hover);
+    }
 
-  &.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
-  }
+    &.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+    }
 }
 
 .sortSelect {
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-main);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  transition: all 0.2s ease;
+    padding: 0.5rem 2rem 0.5rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.5rem center;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    cursor: pointer;
+    appearance: none;
+    min-width: 100px;
 
-  &:hover, &:focus {
-    border-color: var(--primary-color);
-    outline: none;
-  }
-}
-
-.listContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
 }
 
 .historyCard {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem 0 4rem;
+    background: transparent;
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .reservationCard {
-  position: relative;
-  background: var(--bg-card);
-  border-radius: 20px;
-  padding: 1.5rem 2rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--border-color);
-  box-shadow: none;
+    background: white;
+    border-radius: 18px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
 
-  &:hover {
-    border-color: var(--primary-light);
-  }
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    &.cancelled {
+        opacity: 0.7;
+        background: var(--bg-hover);
+        
+        .statusBadge {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+    }
 }
 
 .dateSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 70px;
-  line-height: 1;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    padding-right: 1.25rem;
+    border-right: 1px solid var(--border-color);
 
-  .month {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    letter-spacing: 0.05em;
-  }
+    .month {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 
-  .day {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--text-main);
-    letter-spacing: -0.03em;
-  }
+    .day {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1.1;
+    }
 
-  .weekday {
-    margin-top: 6px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
+    .weekday {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
 }
 
 .infoSection {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-left: 2rem;
-  border-left: 2px solid var(--border-color);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .timeWrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  
-  .timeIcon {
-    color: var(--text-secondary);
-    width: 18px;
-    height: 18px;
-    opacity: 0.7;
-  }
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    
+    .timeIcon {
+        color: var(--primary-color);
+    }
 
-  .time {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text-main);
-    letter-spacing: -0.01em;
-  }
+    .time {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: -0.01em;
+    }
 }
 
 .statusWrapper {
-  display: flex;
-}
-
-.statusBadge {
-  font-size: 0.85rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  background: transparent !important;
-
-  &::before {
-    content: '';
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
-
-  &.confirmed { color: var(--primary-color); }
-  &.pending { color: var(--text-secondary); }
-  &.cancelled { 
-    color: var(--error-text); 
-    opacity: 0.7;
-  }
+    display: flex;
 }
 
 .actionSection {
-  margin-left: auto;
-}
-
-.cancelled {
-  opacity: 0.6;
-  filter: grayscale(1);
-  background: transparent;
-  border: 1px dashed var(--border-color);
-  box-shadow: none !important;
-
-  &:hover {
-    border-color: var(--border-color);
-  }
-  
-  .dateSection .day { color: var(--text-secondary); }
-  .infoSection { border-left-color: transparent; }
+    margin-left: auto;
 }
 
 .emptyState {
-  text-align: center;
-  padding: 5rem 1rem;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border-radius: 24px;
-  border: 1px dashed var(--border-color);
-  margin-top: 1rem;
-}
-
-.emptyIcon {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.3;
-  filter: grayscale(1);
-}
-
-.emptyTitle {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--text-main);
-}
-
-.emptyDesc {
-  font-size: 0.9rem;
-  opacity: 0.6;
-}
-
-.cancelButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1.25rem;
-  border-radius: 12px;
-  border: none;
-  background: var(--error-bg, #fef2f2);
-  color: var(--error-text, #dc2626);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  &:hover {
-    background: #fecaca;
-    transform: translateY(-1px);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-}
-
-// Mobile Responsive
-@media (max-width: 600px) {
-  .reservationCard {
-    padding: 1.5rem;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    border-radius: 20px;
-  }
-
-  .dateSection {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: flex-start;
-    width: 100%;
-    gap: 0.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    text-align: left;
-
-    .month { font-size: 0.85rem; margin-bottom: 0; }
-    .day { font-size: 1.5rem; }
-    .weekday { font-size: 0.9rem; margin-top: 0; }
-  }
-
-  .infoSection {
-    padding-left: 0;
-    border-left: none;
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-  }
+    justify-content: center;
+    padding: 4rem 1rem;
+    text-align: center;
+    background: white;
+    border-radius: 20px;
+    border: 1px dashed var(--border-color);
 
-  .timeWrapper {
-    .time { font-size: 1.1rem; }
-  }
-
-  .actionSection {
-    width: 100%;
-    margin-top: 0.5rem;
-    
-    .cancelButton {
-      width: 100%;
-      padding: 12px;
-      display: flex;
-      justify-content: center;
-      background: var(--bg-hover);
-      border: none;
-      
-      &:hover {
-        background: var(--error-bg);
-      }
+    .emptyIcon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
     }
-  }
+
+    .emptyTitle {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .emptyDesc {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+}
+
+@media (max-width: 480px) {
+    .reservationCard {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .dateSection {
+        padding-right: 1rem;
+        min-width: 50px;
+        
+        .day { font-size: 1.4rem; }
+    }
+    
+    .filterSection {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sortSelect {
+        width: 100%;
+    }
 }

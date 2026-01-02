@@ -15,6 +15,8 @@ import {
     SortType
 } from '@/utils/reservation';
 
+import { Profile } from '@/app/types';
+
 interface Reservation {
     id: string;
     time: string;
@@ -24,9 +26,10 @@ interface Reservation {
 
 interface MyReservationsListProps {
     initialReservations: Reservation[];
+    profile?: Profile | null;
 }
 
-export default function MyReservationsList({ initialReservations }: MyReservationsListProps) {
+export default function MyReservationsList({ initialReservations, profile }: MyReservationsListProps) {
     const { toasts, addToast } = useToast();
     const [displayCount, setDisplayCount] = useState(5);
     const [filter, setFilter] = useState<FilterType>('all');
@@ -65,6 +68,32 @@ export default function MyReservationsList({ initialReservations }: MyReservatio
     return (
         <>
             <ToastContainer toasts={toasts} />
+
+            <ToastContainer toasts={toasts} />
+
+            {/* Profile Section for Naver Review */}
+            {profile && (
+                <div className={styles.profileCard}>
+                    <div className={styles.profileHeader}>
+                        {profile.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={profile.avatar_url} alt="Profile" className={styles.profileAvatar} />
+                        ) : (
+                            <div className={styles.profileAvatarPlaceholder}>
+                                {profile.name?.[0] || 'U'}
+                            </div>
+                        )}
+                        <div className={styles.profileInfo}>
+                            <h2 className={styles.profileName}>
+                                {profile.name || '사용자'}
+                                <span className={styles.profileRole}>{profile.role === 'admin' ? '관리자' : '회원'}</span>
+                            </h2>
+                            <p className={styles.profileEmail}>{profile.email}</p>
+                            {profile.phone && <p className={styles.profilePhone}>{profile.phone}</p>}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Filter & Sort Controls */}
             {initialReservations.length > 0 && (

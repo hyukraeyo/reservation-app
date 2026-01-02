@@ -1,7 +1,7 @@
 'use client'
 
 import styles from './login.module.scss'
-import { login, signup, signInWithKakao } from './actions'
+import { login, signup, signInWithKakao, signInWithNaver } from './actions'
 import { useState, useEffect } from 'react'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -124,6 +124,20 @@ function LoginForm() {
     }
   };
 
+  const handleNaverLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await signInWithNaver();
+      if (res?.url) {
+        window.location.href = res.url;
+      }
+    } catch (error: unknown) {
+      console.error('Naver login error:', error);
+      alert('네이버 로그인 중 오류가 발생했습니다.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.themeWrapper}>
@@ -138,19 +152,6 @@ function LoginForm() {
         <div className={styles.header}>
           <h1>{mode === 'login' ? '환영합니다' : '회원가입'}</h1>
           <p>{mode === 'login' ? '예약 관리를 위해 로그인해주세요' : '무료로 예약을 시작해보세요'}</p>
-        </div>
-
-        <button
-          type="button"
-          className={styles.kakaoButton}
-          onClick={handleKakaoLogin}
-          disabled={loading}
-        >
-          카카오로 시작하기
-        </button>
-
-        <div className={styles.divider}>
-          <span>또는 이메일로 시작하기</span>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -252,7 +253,31 @@ function LoginForm() {
             </button>
 
             <div className={styles.divider}>
-              <span>또는</span>
+              <span>또는 간편 로그인</span>
+            </div>
+
+            <div className={styles.socialButtons}>
+              <button
+                type="button"
+                className={styles.kakaoButton}
+                onClick={handleKakaoLogin}
+                disabled={loading}
+              >
+                카카오로 시작하기
+              </button>
+
+              <button
+                type="button"
+                className={styles.naverButton}
+                onClick={handleNaverLogin}
+                disabled={loading}
+              >
+                네이버로 시작하기
+              </button>
+            </div>
+
+            <div className={styles.divider}>
+              <span>계정이 없으신가요?</span>
             </div>
 
             <button
@@ -264,7 +289,7 @@ function LoginForm() {
                 setPhone('')
               }}
             >
-              {mode === 'login' ? '계정 만들기' : '이미 계정이 있어요'}
+              {mode === 'login' ? '이메일로 회원가입' : '기존 계정으로 로그인'}
             </button>
           </div>
         </form>

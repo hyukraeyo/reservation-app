@@ -122,6 +122,25 @@ export async function updateUserRole(userId: string, newRole: string) {
 }
 
 /**
+ * 사용자를 삭제합니다. (admin 전용 - owner는 불가)
+ * Auth 계정을 삭제하면 Cascade 설정에 따라 Profiles 데이터도 삭제됩니다.
+ */
+export async function deleteUser(userId: string) {
+  const isSuperAdmin = await checkSuperAdmin()
+  if (!isSuperAdmin) return { error: '최고 관리자만 사용자를 삭제할 수 있습니다.' }
+
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+
+  if (error) {
+    console.error('User deletion failed:', error)
+    return { error: '사용자 삭제 실패: ' + error.message }
+  }
+
+  revalidatePath('/admin/users')
+  return { success: true }
+}
+
+/**
  * 모든 예약 목록을 가져옵니다. (관리자 전용)
  */
 export async function getReservations(): Promise<Reservation[]> {
