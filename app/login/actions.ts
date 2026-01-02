@@ -19,20 +19,34 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    // Check user profile status
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, phone')
+      .eq('id', user.id)
+      .single()
 
-  if (user?.email) {
-    const { full_name, phone } = user.user_metadata || {}
+    // If profile doesn't exist, create initial profile
+    if (!profile) {
+      const { full_name, name, phone } = user.user_metadata || {}
+      await supabase.from('profiles').insert({
+        id: user.id,
+        email: user.email,
+        name: full_name || name || null,
+        phone: phone || null,
+      })
 
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      email: user.email,
-      full_name: full_name || null,
-      phone: phone || null,
-    }, {
-      onConflict: 'id',
-      ignoreDuplicates: false
-    })
+      // Newly created profile might be missing info -> redirect
+      if (!full_name && !name || !phone) {
+        redirect('/complete-profile')
+      }
+    } else {
+      // Profile exists, check for missing fields
+      if (!profile.name || !profile.phone) {
+        redirect('/complete-profile')
+      }
+    }
   }
 
   revalidatePath('/', 'layout')
