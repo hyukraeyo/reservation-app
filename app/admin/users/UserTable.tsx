@@ -86,7 +86,7 @@ function RoleSelector({
 function UserMemo({ userId, initialMemo, addToast }: {
   userId: string,
   initialMemo: string | null,
-  addToast: (message: string, type: 'success' | 'error' | 'info') => void
+  addToast: (message: string, type?: 'success' | 'error' | 'info') => void
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [memo, setMemo] = useState(initialMemo || '')
@@ -293,7 +293,7 @@ export default function UserTable({ users }: { users: Profile[] }) {
           </div>
 
           {/* Memo */}
-          <UserMemo userId={user.id} initialMemo={user.memo} addToast={addToast} />
+          <UserMemo userId={user.id} initialMemo={user.memo || null} addToast={addToast} />
         </Card>
       ))}
 
