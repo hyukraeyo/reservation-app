@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  // Explicit setting for iOS splash screen (workaround for Next.js 15)
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
@@ -43,64 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning className={pretendard.variable}>
-      <head>
-        {/* Inline critical CSS for instant splash screen */}
-        <style dangerouslySetInnerHTML={{
-          __html: `
-          #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            transition: opacity 0.3s ease-out;
-          }
-          #splash-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-          }
-          #splash-logo {
-            font-size: 4rem;
-            font-weight: 900;
-            color: #0f766e;
-            letter-spacing: -0.05em;
-            animation: splash-pulse 1.5s ease-in-out infinite;
-          }
-          @keyframes splash-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.85; transform: scale(0.97); }
-          }
-          @media (prefers-color-scheme: dark) {
-            #splash-screen { background: #1e293b; }
-            #splash-logo { color: #2dd4bf; }
-          }
-        `}} />
-      </head>
       <body className={pretendard.className}>
-        {/* Inline splash screen - shows immediately before React hydration */}
-        <div id="splash-screen">
-          <span id="splash-logo">m9</span>
-        </div>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-          // Hide splash screen after DOM is ready
-          if (document.readyState === 'complete') {
-            document.getElementById('splash-screen')?.classList.add('hidden');
-            setTimeout(() => document.getElementById('splash-screen')?.remove(), 300);
-          } else {
-            window.addEventListener('load', function() {
-              setTimeout(function() {
-                document.getElementById('splash-screen')?.classList.add('hidden');
-                setTimeout(() => document.getElementById('splash-screen')?.remove(), 300);
-              }, 100);
-            });
-          }
-        `}} />
         <Providers>
           <Suspense fallback={<HeaderSkeleton />}>
             <AuthenticatedHeader />

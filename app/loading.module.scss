@@ -5,20 +5,34 @@
   justify-content: center;
   height: 100dvh;
   width: 100%;
-  background-color: var(--bg-card); /* 카드 배경색(보통 흰색/검은색) 사용 */
+  background-color: #f8fafc; /* Explicit light color */
   position: fixed;
   top: 0;
   left: 0;
   z-index: 9999;
 }
 
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #1e293b;
+  }
+}
+
 .logo {
   font-size: 4rem;
   font-weight: 900;
-  color: var(--primary-color); /* m9의 메인 컬러 */
+  color: #0f766e; /* Explicit teal color */
   letter-spacing: -0.05em;
   animation: pulse 1.5s ease-in-out infinite;
   margin-bottom: 1rem;
+}
+
+/* Dark mode logo color */
+@media (prefers-color-scheme: dark) {
+  .logo {
+    color: #2dd4bf;
+  }
 }
 
 .spinner {
