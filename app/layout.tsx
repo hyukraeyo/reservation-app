@@ -154,15 +154,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning className={pretendard.variable} style={{ backgroundColor: '#162136' }}>
-      <body className={pretendard.className} style={{ backgroundColor: '#f8fafc' }}>
+      <body className={pretendard.className} style={{ backgroundColor: '#162136' }}>
         <Providers>
           <SplashScreen />
-          <Suspense fallback={<HeaderSkeleton />}>
-            <AuthenticatedHeader />
-          </Suspense>
-          <main className="page-container">
-            {children}
-          </main>
+          <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Suspense fallback={<HeaderSkeleton />}>
+              <AuthenticatedHeader />
+            </Suspense>
+            <main className="page-container" style={{ flex: 1 }}>
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>
