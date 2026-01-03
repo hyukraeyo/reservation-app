@@ -153,8 +153,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning className={pretendard.variable} style={{ backgroundColor: '#f8fafc' }}>
-      <body className={pretendard.className} style={{ backgroundColor: '#f8fafc' }}>
+    <html lang="ko" suppressHydrationWarning className={pretendard.variable} style={{ backgroundColor: '#000000' }}>
+      <body className={pretendard.className} style={{ backgroundColor: '#000000' }}>
         <Providers>
           <SplashScreen />
           <Suspense fallback={<HeaderSkeleton />}>
