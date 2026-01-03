@@ -58,7 +58,7 @@ export async function checkSuperAdmin(): Promise<boolean> {
 
 /**
  * 모든 사용자 목록을 가져옵니다. (admin 전용)
- * profiles 테이블과 auth.users(메타데이터)를 병합하여 반환합니다.
+ * profiles 테이블에서 직접 조회하여 성능을 최적화했습니다.
  */
 export async function getUsers() {
   const isSuperAdmin = await checkSuperAdmin()
@@ -66,40 +66,15 @@ export async function getUsers() {
     redirect('/')
   }
 
-  // 1. Profiles (DB)
   const supabase = await createClient()
   const { data: profiles, error } = await supabase
     .from('profiles')
     .select('*')
-    .order('name')
+    .order('created_at', { ascending: false }) // 최신 가입순 정렬
 
   if (error) throw new Error(error.message)
 
-  // 2. Auth Users (Metadata -> memo, created_at)
-  // supabaseAdmin을 사용하여 모든 유저 정보 가져오기 (Service Role 필요)
-  const { data: { users: authUsers }, error: authError } = await supabaseAdmin.auth.admin.listUsers({
-    perPage: 1000
-  })
-
-  if (authError) {
-    console.warn('Auth user list fetch failed:', authError)
-    // Auth 정보 조회 실패 시 profiles만 반환 (메모, 가입일 누락될 수 있음)
-    return profiles
-  }
-
-  // 3. 병합
-  const mergedUsers = profiles.map(profile => {
-    const authUser = authUsers.find(u => u.id === profile.id)
-    return {
-      ...profile,
-      // Metadata의 memo가 있으면 사용
-      memo: (authUser?.user_metadata?.memo as string) || profile.memo || null,
-      // Auth User의 created_at 사용
-      created_at: authUser?.created_at || profile.created_at || null
-    }
-  })
-
-  return mergedUsers
+  return profiles
 }
 
 /**
@@ -212,24 +187,24 @@ export async function updateReservationStatus(
 
 /**
  * 사용자 메모를 업데이트합니다. (관리자 전용)
- * profiles 테이블에 컬럼이 없을 경우를 대비해 user_metadata에 저장합니다.
- * 이 방식은 DB 마이그레이션 없이도 데이터를 저장할 수 있습니다.
+ * profiles 테이블에 직접 저장합니다.
  */
 export async function updateUserMemo(userId: string, memo: string) {
   const isAdmin = await checkAdmin()
   if (!isAdmin) throw new Error('권한이 없습니다.')
 
-  // 1. user_metadata에 저장 (Admin API 사용)
-  const { error: metaError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-    user_metadata: { memo: memo }
-  })
+  const supabase = await createClient()
 
-  if (metaError) {
-    console.error('Meta update failed:', metaError)
-    return { error: '메모 저장 실패: ' + metaError.message }
+  const { error } = await supabase
+    .from('profiles')
+    .update({ memo: memo })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('Memo update failed:', error)
+    return { error: '메모 저장 실패: ' + error.message }
   }
 
-  // 데이터 갱신을 위해 경로 재검증
   revalidatePath('/admin/users')
   return { success: true }
 }

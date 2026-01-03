@@ -27,6 +27,7 @@ function UserMemo({ userId, initialMemo, addToast }: {
   const [memo, setMemo] = useState(initialMemo || '')
   const [tempMemo, setTempMemo] = useState(initialMemo || '')
   const [isSaving, setIsSaving] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const handleEdit = () => {
     setTempMemo(memo)
@@ -58,6 +59,17 @@ function UserMemo({ userId, initialMemo, addToast }: {
     }
   }
 
+  const shouldTruncate = (text: string) => {
+    if (!text) return false;
+    const lines = text.split('\n');
+    return text.length > 200 || lines.length > 6;
+  };
+
+  const isTruncated = shouldTruncate(memo);
+
+  // No manual truncation logic needed here for displayContent if we use CSS masking
+  // But we might need it for logic check. We keep isTruncated.
+
   return (
     <div className={styles.memoSection}>
       <div className={styles.memoHeader}>
@@ -85,9 +97,41 @@ function UserMemo({ userId, initialMemo, addToast }: {
           </div>
         </>
       ) : (
-        <div className={`${styles.memoContent} ${!memo ? styles.empty : ''}`} onClick={handleEdit} style={{ cursor: 'pointer' }}>
-          {memo || '등록된 메모가 없습니다. 내용을 추가하려면 클릭하세요.'}
-        </div>
+        <>
+          <div
+            className={`${styles.memoContent} ${!memo ? styles.empty : ''} ${isTruncated && !isExpanded ? styles.collapsed : ''}`}
+          >
+            {memo || '등록된 메모가 없습니다.'}
+
+            {isTruncated && !isExpanded && (
+              <div
+                className={styles.gradientOverlay}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(true);
+                }}
+              >
+                <span>더보기 ▾</span>
+              </div>
+            )}
+          </div>
+
+          {isTruncated && isExpanded && (
+            <div
+              style={{
+                textAlign: 'center',
+                cursor: 'pointer',
+                marginTop: '-5px',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                padding: '0.5rem'
+              }}
+              onClick={() => setIsExpanded(false)}
+            >
+              접기 ▴
+            </div>
+          )}
+        </>
       )}
     </div>
   )
