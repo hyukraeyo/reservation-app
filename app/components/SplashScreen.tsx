@@ -75,8 +75,8 @@ export default function SplashScreen({ minimumDisplayTime = 1500 }: SplashScreen
                 <Image
                     src="/logo-m9.svg"
                     alt="m9"
-                    width={240}
-                    height={240}
+                    width={160}
+                    height={160}
                     className={styles.logo}
                     priority
                 />
