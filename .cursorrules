@@ -1,106 +1,51 @@
-# 프로젝트 원칙 및 에이전트 행동 지침
+# 프로젝트 개발 원칙 및 에이전트 행동 지침 (.cursorrules)
 
-## 1. 언어 및 커뮤니케이션 (CRITICAL)
-- **전용 언어**: 모든 생각(Thought), 답변(Response), 코드 주석은 **반드시 100% 한국어**로만 작성한다. 영어 사용은 절대 금지한다.
-- **태도**: 전문적이고 명확하며 통찰력 있는 답변을 제공한다.
+## 1. 기본 원칙 (Fundamentals)
+- **언어 (Language)**: 모든 생각(Thought), 대화, 코드 주석, 커밋 메시지는 **반드시 한국어**로 작성한다.
+- **아키텍처 (Architecture)**: Next.js 16 App Router 기반의 Server Components 아키텍처를 엄격히 준수한다.
+- **스타일링 (Styling)**: **SCSS Modules**(`*.module.scss`)를 유일한 스타일링 방식으로 채택한다. (Tailwind CSS 사용 금지)
 
-## 2. 개발 및 구현 프로세스 (CRITICAL)
+## 2. 성능 최적화 가이드라인 (Performance Optimization)
+이 프로젝트의 핵심 가치는 **빠른 속도와 효율성**이다. 다음 패턴을 반드시 따른다.
 
-### 2.1 공식 문서 및 최신 권장사항 참고 (필수)
-- **사전 조사 필수**: 코드를 작성하기 전, 반드시 해당 기술의 **공식 문서(Official Documentation)**와 **최신 권장 사항(Best Practices)**을 확인한다.
-- **웹 검색 활용**: 새로운 기능 구현, 외부 API 연동, 라이브러리 사용 시 반드시 `search_web` 도구를 활용하여 최신 정보를 확인한다.
-- **참고 소스 우선순위**:
-  1. 공식 문서 (nextjs.org, react.dev, supabase.com 등)
-  2. 공식 GitHub 저장소의 Issues/Discussions
-  3. 공식 블로그 및 릴리즈 노트
-  4. Stack Overflow, Reddit 등 검증된 커뮤니티
-- **버전 호환성**: 현재 프로젝트의 패키지 버전(package.json)을 확인하고, 해당 버전에 맞는 문서를 참조한다.
-- **Deprecated 주의**: 더 이상 권장되지 않는(deprecated) API나 패턴은 사용하지 않는다.
+### 2.1 데이터 페칭 전략 (Data Fetching)
+- **위치**: 데이터 로딩은 가능한 한 **최상위 `page.tsx`(Server Component)**에서 수행한다.
+- **전달**: 하위 클라이언트 컴포넌트는 데이터를 직접 fetch하지 않고, 부모로부터 **props**로 전달받는다.
+- **병렬 처리**: 서로 의존성이 없는 비동기 요청은 반드시 `Promise.all()`로 병렬 실행한다.
+  ```typescript
+  // ✅ Good: 병렬 실행
+  const [user, reservations] = await Promise.all([
+    getUser(),
+    getReservations()
+  ]);
+  
+  // ❌ Bad: 순차 실행 (Waterfall)
+  const user = await getUser();
+  const reservations = await getReservations();
+  ```
 
-### 2.2 표준 및 코드 품질
-- **표준 준수**: 커뮤니티와 업계에서 가장 널리 사용되고 검증된 패턴(De Facto Standards)을 우선적으로 채택한다.
-- **코드 품질**:
-  - 가독성, 유지보수성, 성능을 모두 고려한 **최상위 품질(Highest Quality)**의 코드를 작성한다.
-  - '돌아가기만 하는 코드'가 아닌, 확장 가능하고 견고한 아키텍처를 설계한다.
-  - 불필요한 복잡성을 피하고(Keep It Simple), 클린 코드 원칙을 준수한다.
-- **변경 전 확인**: 기존 코드를 수정할 때는 해당 패턴이 왜 사용되었는지 먼저 파악하고, 더 나은 대안이 있는지 검토한다.
+### 2.2 렌더링 최적화
+- **Use Client**: `useState`, `useEffect`, 이벤트 핸들러가 꼭 필요한 컴포넌트 최상단에만 `'use client'`를 명시한다.
+- **스켈레톤 UI**: 각 페이지 폴더(`app/xyz/`)에는 반드시 `loading.tsx`를 구현하여 즉각적인 로딩 피드백을 제공한다.
 
-## 3. 기술 스택 및 도구 활용
-- **Next.js 16 & React 19**: 최신 기능(Server Components, Turbopack 등)을 적절히 활용하되, 안정성이 검증된 방식을 따른다.
-- **Node.js 22+**: ESLint 9 및 최신 ECMAScript 기능 호환을 위해 Node.js 22 이상을 사용한다.
-- **스타일링**: SCSS Modules(`*.module.scss`)와 CSS 변수를 활용하여 모듈화되고 재사용 가능한 디자인 시스템을 구축한다. Tailwind CSS는 사용하지 않는다.
-- **라이브러리 추가**: 필요한 경우 `date-fns`, `web-push`와 같이 검증된 경량 라이브러리를 사용하며, 무분별한 의존성 추가를 지양한다.
+## 3. 코드 품질 및 스타일 (Code Quality)
+- **타입스크립트**: `any` 타입 사용을 엄격히 금지한다. 공용 타입은 `app/types/index.ts`에 정의된 인터페이스를 사용한다.
+- **명명 규칙**:
+  - 컴포넌트: `PascalCase` (예: `ReservationCard.tsx`)
+  - 함수/변수: `camelCase` (예: `fetchUserData`)
+  - 상수: `UPPER_SNAKE_CASE` (예: `MAX_RETRY_COUNT`)
+- **주석**: 복잡한 로직이나 비즈니스 규칙이 포함된 부분에는 반드시 한국어 설명 주석을 첨부한다.
 
-## 4. 타입 안전성
-- **`any` 사용 금지**: 모든 타입은 명시적으로 정의한다. `any` 타입은 절대 사용하지 않는다.
-- **공용 타입**: 여러 파일에서 사용되는 타입은 `app/types/index.ts`에 정의한다.
-- **타입 임포트**: 타입만 임포트할 경우 `import type`을 사용한다.
+## 4. 데이터베이스 및 백엔드 (Supabase)
+- **직접 접근**: 관리자(Admin) 기능 등 서버 사이드 로직에서는 불필요한 HTTP API 호출 대신 **Supabase 클라이언트를 통해 DB 테이블에 직접 접근**하여 오버헤드를 줄인다.
+- **보안**: 클라이언트(`Browser Client`)에서 민감한 데이터를 다룰 때는 RLS(Row Level Security) 정책이 올바르게 적용되었는지 항상 고려한다.
 
-## 5. 권한 및 보안
-- **역할 기반 접근 제어**:
-  - `user`: 예약 생성 및 본인 알림 수신
-  - `owner`: 예약 관리 (승인/취소) + 새 예약 알림 수신
-  - `admin`: 모든 권한 + 사용자 역할 변경
-- **민감한 작업**: 사용자 역할 변경은 `admin` 권한을 가진 사용자만 가능하다.
-- **서버 액션**: 민감한 작업은 반드시 Server Action에서 권한 체크 후 수행한다.
+## 5. UI/UX 디자인 원칙
+- **모바일 퍼스트**: 모든 UI는 모바일 화면(360px~480px)을 기준으로 먼저 설계하고, 데스크탑은 미디어 쿼리로 대응한다.
+- **미니멀리즘**: 불필요한 장식은 배제하고, 목적에 집중한 깔끔한 디자인을 추구한다.
+- **피드백**: 사용자의 모든 액션(클릭, 저장, 삭제 등)에는 즉각적인 시각적 피드백(Toast, Loading Spinner 등)이 동반되어야 한다.
 
-## 6. 컴포넌트 아키텍처
-- **Server Components 우선**: 기본적으로 Server Components를 사용한다.
-- **Client Components**: 상태 관리, 이벤트 핸들링이 필요한 경우에만 `'use client'`를 사용한다.
-- **공용 컴포넌트**: 재사용 가능한 컴포넌트는 `app/components/`에 배치한다.
-- **스타일 모듈**: 각 컴포넌트에 대응하는 `*.module.scss` 파일을 함께 생성한다.
-
-## 7. 성능 최적화 패턴 (CRITICAL)
-
-### 7.1 데이터 로딩 위치
-- **`page.tsx`에서 데이터 로딩**: 모든 데이터 호출은 `page.tsx` (최상위 서버 컴포넌트)에서 수행한다.
-- **하위 컴포넌트는 props로 수신**: 하위 컴포넌트는 데이터를 직접 fetch하지 않고, props로 전달받아 렌더링만 담당한다.
-
-```
-# 올바른 패턴
-page.tsx (async, 데이터 로딩)
-    ↓ props 전달
-Component.tsx (렌더링만 담당)
-
-# 잘못된 패턴 ❌
-page.tsx → Component.tsx (내부에서 async fetch)
-```
-
-### 7.2 병렬 데이터 로딩
-- **`Promise.all()` 사용**: 독립적인 데이터 호출은 반드시 병렬로 실행한다.
-- **Waterfall 방지**: 순차적 await 체인을 지양한다.
-
-```typescript
-// ✅ 올바른 패턴
-const [reservations, profile] = await Promise.all([
-  getReservations(),
-  getProfile(),
-]);
-
-// ❌ 잘못된 패턴
-const reservations = await getReservations();
-const profile = await getProfile();
-```
-
-### 7.3 로딩 UI (Skeleton)
-- **`loading.tsx` 필수**: 각 라우트 폴더에 `loading.tsx`를 배치하여 스켈레톤 UI를 제공한다.
-- **Streaming 활용**: Next.js가 자동으로 Suspense 경계를 생성하여 점진적 렌더링을 수행한다.
-- **스켈레톤 최소화 원칙**:
-  - **정적 요소 유지**: 카드 테두리, 버튼 레이아웃, 아이콘 등 구조적 요소는 실제 UI 그대로 렌더링한다.
-  - **동적 데이터만 스켈레톤**: 텍스트, 숫자, 상태 배지 등 서버에서 로드되는 데이터만 스켈레톤으로 표시한다.
-  - **레이아웃 시프트 방지**: 스켈레톤과 실제 UI의 크기/위치가 동일해야 CLS(Cumulative Layout Shift)를 방지한다.
-  - **이질감 최소화**: 전체 영역을 회색 블록으로 덮지 않고, 실제 UI 구조를 최대한 유지한다.
-
-### 7.4 Server/Client 분리
-- **Server Component**: 데이터 로딩, 권한 체크, 정적 UI
-- **Client Component**: 실시간 업데이트, 이벤트 핸들링, 상태 관리
-- **초기 데이터 패턴**: Server에서 초기 데이터를 로드하고, Client에서 실시간 업데이트를 구독한다.
-
-## 8. 린팅 및 코드 검사
-- **린트 통과 필수**: 모든 커밋 전 `npm run lint`를 실행하여 에러가 없어야 한다.
-- **ESLint 9**: Next.js 16 권장 설정을 따른다.
-- **경고 처리**: 경고(warning)도 가급적 해결한다.
-
-## 9. 문서화
-- **JSDoc 주석**: 주요 함수에는 한글 JSDoc 주석을 작성한다.
-- **README 동기화**: 주요 기능 변경 시 README.md를 업데이트한다.
+## 6. 에이전트 행동 지침 (Agent Behavior)
+- **능동적 제안**: 사용자의 요청을 수동적으로만 따르지 말고, 더 나은 성능이나 구조적인 개선안이 보이면 적극적으로 제안한다.
+- **검증**: 코드를 수정하거나 기능을 추가한 후에는 반드시 빌드(`npm run build`)나 린트(`npm run lint`)를 통해 무결성을 검증한다.
+- **히스토리 파악**: 이전 대화 맥락을 파악하여 중복된 질문을 하지 않는다.

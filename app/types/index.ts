@@ -11,6 +11,7 @@ export interface Profile {
   birthyear?: string | null;
   memo?: string | null;
   created_at?: string | null;
+  push_subscription?: any; // PushSubscription JSON object
 }
 
 export interface Reservation {
