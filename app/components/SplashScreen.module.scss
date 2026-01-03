@@ -9,8 +9,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 네이비 배경 - manifest background_color와 일치 */
-  background: #162136;
+  /* 밝은 배경 - manifest background_color와 일치 */
+  background: #f8fafc;
   opacity: 1;
   visibility: visible;
   transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
@@ -119,13 +119,9 @@
   }
 }
 
-/* 다크모드 미디어 쿼리 통합됨 (단일 테마) */
+/* 다크모드에서도 밝은 테마 유지 (로그인 화면 일치) */
 @media (prefers-color-scheme: dark) {
   .splashScreen {
-    background: #162136;
-  }
-  
-  .dot {
-    background-color: #2dd4bf;
+    background: #f8fafc;
   }
 }

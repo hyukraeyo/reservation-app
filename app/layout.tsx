@@ -153,18 +153,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning className={pretendard.variable} style={{ backgroundColor: '#162136' }}>
-      <body className={pretendard.className} style={{ backgroundColor: '#162136' }}>
+    <html lang="ko" suppressHydrationWarning className={pretendard.variable} style={{ backgroundColor: '#f8fafc' }}>
+      <body className={pretendard.className} style={{ backgroundColor: '#f8fafc' }}>
         <Providers>
           <SplashScreen />
-          <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Suspense fallback={<HeaderSkeleton />}>
-              <AuthenticatedHeader />
-            </Suspense>
-            <main className="page-container" style={{ flex: 1 }}>
-              {children}
-            </main>
-          </div>
+          <Suspense fallback={<HeaderSkeleton />}>
+            <AuthenticatedHeader />
+          </Suspense>
+          <main className="page-container">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
