@@ -80,12 +80,6 @@ export default function SplashScreen({ minimumDisplayTime = 1500 }: SplashScreen
                     className={styles.logo}
                     priority
                 />
-                <p className={styles.tagline}>노쇼 방지 예약 시스템</p>
-            </div>
-            <div className={styles.dots} aria-hidden="true">
-                <span className={styles.dot}></span>
-                <span className={styles.dot}></span>
-                <span className={styles.dot}></span>
             </div>
         </div>
     );
