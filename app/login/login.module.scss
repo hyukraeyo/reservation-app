@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background: radial-gradient(circle at top left, #f8fafc, #f1f5f9);
+  /* background: radial-gradient(circle at top left, #f8fafc, #f1f5f9); - removed for seamless bg */
   position: relative;
   overflow: hidden;
 
@@ -13,20 +13,9 @@
     padding: 0.8rem; /* 모바일 컨테이너 패딩 최소화 */
   }
 
-  :global(.dark) & {
-    background: radial-gradient(circle at top left, #0f172a, #020617);
-  }
+  /* Dark mode background removed */
 
-  &::before {
-    content: '';
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(0, 112, 243, 0.05), transparent);
-    top: -100px;
-    right: -100px;
-    border-radius: 50%;
-  }
+  /* ::before decoration removed */
 }
 
 .themeWrapper {
