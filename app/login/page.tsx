@@ -7,6 +7,7 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ThemeToggle } from '@/app/components/ThemeToggle'
 import LoadingSpinner from '@/app/components/LoadingSpinner'
+import InstallPrompt from '@/app/components/InstallPrompt'
 
 
 function LoginForm() {
@@ -119,6 +120,7 @@ function LoginForm() {
                 네이버로 시작하기
               </button>
             </div>
+            <InstallPrompt />
           </div>
         </div>
       </div>
