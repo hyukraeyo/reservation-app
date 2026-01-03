@@ -27,13 +27,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* animation removed - static logo match */
+  animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .logo {
   object-fit: contain;
   margin-bottom: 0;
-  transform: translateY(-20px); /* 네이티브 스플래시 위치와 맞추기 위해 미세하게 위로 이동 */
 }
 
-/* Animations removed */
+/* Animations */
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
