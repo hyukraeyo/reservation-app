@@ -19,99 +19,99 @@ export const metadata: Metadata = {
     startupImage: [
       // iPhone 17 Pro Max, 16 Pro Max (1320x2868)
       {
-        url: "/splashscreens/apple-splash-1320-2868.jpg",
+        url: "/splashscreens/apple-splash-1320-2868.png",
         media: "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 17 Air (Slim) - 예상 스펙 (1260x2736)
       {
-        url: "/splashscreens/apple-splash-1284-2778.jpg", // 가장 가까운 해상도 이미지 재사용
+        url: "/splashscreens/apple-splash-1284-2778.png", // 가장 가까운 해상도 이미지 재사용
         media: "(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 17 Pro, 17, 16 Pro, 15 Pro, 14 Pro Max (1290x2796)
       // Note: iPhone 17/17 Pro는 16 Pro와 동일한 1206x2622 해상도로 예상되나, 
       // 일부 모델은 1290x2796을 공유할 수도 있어 범용적으로 대응
       {
-        url: "/splashscreens/apple-splash-1290-2796.jpg",
+        url: "/splashscreens/apple-splash-1290-2796.png",
         media: "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 16 Plus, 15 Plus, 14 Plus (1284x2778)
       {
-        url: "/splashscreens/apple-splash-1284-2778.jpg",
+        url: "/splashscreens/apple-splash-1284-2778.png",
         media: "(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 17, 17 Pro, 16, 16 Pro (1206x2622) - iPhone 17 일반 모델도 이 해상도 예상
       {
-        url: "/splashscreens/apple-splash-1206-2622.jpg",
+        url: "/splashscreens/apple-splash-1206-2622.png",
         media: "(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 15, 14 Pro (1179x2556)
       {
-        url: "/splashscreens/apple-splash-1179-2556.jpg",
+        url: "/splashscreens/apple-splash-1179-2556.png",
         media: "(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 14, 13, 13 Pro, 12, 12 Pro (1170x2532)
       {
-        url: "/splashscreens/apple-splash-1170-2532.jpg",
+        url: "/splashscreens/apple-splash-1170-2532.png",
         media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 13 mini, 12 mini, 11 Pro, XS, X (1125x2436)
       {
-        url: "/splashscreens/apple-splash-1125-2436.jpg",
+        url: "/splashscreens/apple-splash-1125-2436.png",
         media: "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 11 Pro Max, XS Max (1242x2688)
       {
-        url: "/splashscreens/apple-splash-1242-2688.jpg",
+        url: "/splashscreens/apple-splash-1242-2688.png",
         media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone 11, XR (828x1792)
       {
-        url: "/splashscreens/apple-splash-828-1792.jpg",
+        url: "/splashscreens/apple-splash-828-1792.png",
         media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPhone 8 Plus, 7 Plus, 6s Plus (1242x2208)
       {
-        url: "/splashscreens/apple-splash-1242-2208.jpg",
+        url: "/splashscreens/apple-splash-1242-2208.png",
         media: "(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
       },
       // iPhone SE (3rd/2nd gen), 8, 7, 6s (750x1334)
       {
-        url: "/splashscreens/apple-splash-750-1334.jpg",
+        url: "/splashscreens/apple-splash-750-1334.png",
         media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPhone SE (1st gen), 5s, 5c (640x1136)
       {
-        url: "/splashscreens/apple-splash-640-1136.jpg",
+        url: "/splashscreens/apple-splash-640-1136.png",
         media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad Pro 12.9" (2048x2732)
       {
-        url: "/splashscreens/apple-splash-2048-2732.jpg",
+        url: "/splashscreens/apple-splash-2048-2732.png",
         media: "(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad Pro 11" (1668x2388)
       {
-        url: "/splashscreens/apple-splash-1668-2388.jpg",
+        url: "/splashscreens/apple-splash-1668-2388.png",
         media: "(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad Pro 10.5", Air 3rd gen (1668x2224)
       {
-        url: "/splashscreens/apple-splash-1668-2224.jpg",
+        url: "/splashscreens/apple-splash-1668-2224.png",
         media: "(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad Air 5/4, 10th gen (1640x2360)
       {
-        url: "/splashscreens/apple-splash-1640-2360.jpg",
+        url: "/splashscreens/apple-splash-1640-2360.png",
         media: "(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad 9th/8th/7th gen (1620x2160)
       {
-        url: "/splashscreens/apple-splash-1620-2160.jpg",
+        url: "/splashscreens/apple-splash-1620-2160.png",
         media: "(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad mini 6th gen (1488x2266)
       {
-        url: "/splashscreens/apple-splash-1488-2266.jpg",
+        url: "/splashscreens/apple-splash-1488-2266.png",
         media: "(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
       },
       // iPad 6th/5th gen, mini 5th gen (1536x2048)
