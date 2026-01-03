@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore, useState, useEffect, useCallback } from 'react';
 import styles from './SplashScreen.module.scss';
+import Image from 'next/image';
 
 interface SplashScreenProps {
     minimumDisplayTime?: number; // 최소 표시 시간 (ms)
@@ -71,7 +72,14 @@ export default function SplashScreen({ minimumDisplayTime = 1500 }: SplashScreen
             role="status"
         >
             <div className={styles.logoContainer}>
-                <h1 className={styles.logo}>m9</h1>
+                <Image
+                    src="/logo-m9.svg"
+                    alt="m9"
+                    width={240}
+                    height={240}
+                    className={styles.logo}
+                    priority
+                />
                 <p className={styles.tagline}>노쇼 방지 예약 시스템</p>
             </div>
             <div className={styles.dots} aria-hidden="true">

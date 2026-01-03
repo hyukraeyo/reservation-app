@@ -9,8 +9,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 밝은 배경 - manifest background_color와 일치 */
-  background: #1e1e1e;
+  /* 네이비 배경 - manifest background_color와 일치 */
+  background: #162136;
   opacity: 1;
   visibility: visible;
   transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
@@ -31,11 +31,7 @@
 }
 
 .logo {
-  font-size: 4.5rem;
-  font-weight: 900;
-  /* 틸 컬러 로고 - 앱 테마와 일치 */
-  color: #0f766e;
-  letter-spacing: -0.05em;
+  object-fit: contain;
   margin-bottom: 0.5rem;
 }
 
@@ -119,18 +115,10 @@
   }
 }
 
-/* 다크모드 지원 */
+/* 다크모드 미디어 쿼리 통합됨 (단일 테마) */
 @media (prefers-color-scheme: dark) {
   .splashScreen {
-    background: #0f172a;
-  }
-  
-  .logo {
-    color: #2dd4bf;
-  }
-  
-  .tagline {
-    color: #94a3b8;
+    background: #162136;
   }
   
   .dot {
